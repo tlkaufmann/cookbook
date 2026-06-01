@@ -213,6 +213,27 @@ export default function RecipeForm() {
           <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
           <input value={form.image || ''} onChange={e => field('image', e.target.value)}
             className={inputCls} placeholder="https://images.example.com/photo.jpg" />
+          {form.image && /^https?:\/\//.test(form.image) && (
+            <div className="mt-2 flex items-center gap-2">
+              <img
+                src={form.image}
+                alt="Recipe preview"
+                loading="lazy"
+                className="h-16 w-16 rounded border border-gray-200 object-cover"
+                onError={e => {
+                  e.currentTarget.style.display = 'none'
+                }}
+              />
+              <a
+                href={form.image}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-[#143109] hover:underline break-all"
+              >
+                Open image
+              </a>
+            </div>
+          )}
         </div>
       </section>
 

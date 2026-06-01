@@ -68,6 +68,86 @@ function extractOGImage(html) {
   return null
 }
 
+function parseImageSizeHints(url) {
+  const hints = { width: 0, height: 0 }
+  if (!url) return hints
+
+  const resizeMatch = url.match(/(?:resize|size)=([0-9]{2,4})[,x]([0-9]{2,4})/i)
+  if (resizeMatch) {
+    hints.width = Number(resizeMatch[1]) || 0
+    hints.height = Number(resizeMatch[2]) || 0
+    return hints
+  }
+
+  const wMatch = url.match(/[?&](?:w|width)=([0-9]{2,4})/i)
+  const hMatch = url.match(/[?&](?:h|height)=([0-9]{2,4})/i)
+  hints.width = wMatch ? Number(wMatch[1]) || 0 : 0
+  hints.height = hMatch ? Number(hMatch[1]) || 0 : 0
+  return hints
+}
+
+function isLikelyLogoOrIcon(url, alt = '') {
+  const haystack = `${url} ${alt}`.toLowerCase()
+  return /(logo|icon|avatar|sprite|favicon|badge|brand)/.test(haystack)
+}
+
+function scoreImageCandidate(candidate, titleIndex) {
+  const { width, height } = parseImageSizeHints(candidate.url)
+  const isBig = width >= 500 || height >= 320
+  const isVeryCloseToTitle = candidate.index >= titleIndex && candidate.index <= titleIndex + 12000
+  const isCloseToTitle = candidate.index >= titleIndex && candidate.index <= titleIndex + 24000
+
+  let score = 0
+  if (isBig) score += 50
+  if (isVeryCloseToTitle) score += 40
+  else if (isCloseToTitle) score += 20
+  if (/\b(recipe|food|meal|dish|production|images?)\b/i.test(candidate.url)) score += 10
+  if (isLikelyLogoOrIcon(candidate.url, candidate.alt)) score -= 200
+
+  return score
+}
+
+function extractFallbackImageNearTitle(html, logger) {
+  const normalized = (html || '').replace(/\r\n/g, '\n')
+  if (!normalized) return null
+
+  const candidates = []
+
+  for (const match of normalized.matchAll(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/gi)) {
+    candidates.push({ alt: match[1] || '', url: match[2], index: match.index || 0 })
+  }
+
+  for (const match of normalized.matchAll(/<img[^>]+src=["'](https?:\/\/[^"']+)["'][^>]*>/gi)) {
+    const tag = match[0] || ''
+    const altMatch = tag.match(/alt=["']([^"']*)["']/i)
+    candidates.push({ alt: altMatch?.[1] || '', url: match[1], index: match.index || 0 })
+  }
+
+  if (candidates.length === 0) {
+    logger?.log('Fallback image scan: no image candidates found in fetched content')
+    return null
+  }
+
+  const headingMatch = normalized.match(/(^|\n)#\s+.+/)
+  const titleIndex = headingMatch?.index || 0
+
+  const ranked = candidates
+    .filter(c => c.url && /^https?:\/\//i.test(c.url))
+    .map(c => ({ ...c, score: scoreImageCandidate(c, titleIndex) }))
+    .sort((a, b) => b.score - a.score)
+
+  const winner = ranked[0]
+  if (!winner || winner.score < 0) {
+    logger?.log('Fallback image scan: only low-quality candidates (likely logos/icons)')
+    return null
+  }
+
+  logger?.log(
+    `Fallback image selected: ${winner.url.substring(0, 160)} (score=${winner.score})`
+  )
+  return winner.url
+}
+
 function withTimeout(ms) {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), ms)
@@ -313,6 +393,8 @@ export async function extractRecipeFromHTML(html, sourceUrl, apiKey, logger) {
   try {
     const ogImage = extractOGImage(html)
     logger?.log(`Extracted Open Graph image: ${ogImage || 'not found'}`)
+    const fallbackImage = ogImage ? null : extractFallbackImageNearTitle(html, logger)
+    const imageHint = ogImage || fallbackImage
 
     const systemPrompt = `You are a recipe extraction assistant. Extract recipe information from the provided HTML and return ONLY valid JSON (no markdown, no code blocks, just raw JSON).
 
@@ -326,7 +408,7 @@ Rules:
 - Units must be one of: g, kg, ml, l, tsp, tbsp, cup, oz, lb, or empty string
 - Times should be in minutes (integers)
 - If og:image was found in metadata, use it for the image field
-${ogImage ? `- The og:image URL is: ${ogImage}` : ''}
+${imageHint ? `- Preferred image URL for this page is: ${imageHint}` : ''}
 - Return ONLY the JSON object, nothing else
 - Do not wrap output in markdown or code fences`
 
@@ -415,9 +497,9 @@ ${ogImage ? `- The og:image URL is: ${ogImage}` : ''}
 
     // Add source URL
     recipe.source = sourceUrl
-    if (!recipe.image && ogImage) {
-      recipe.image = ogImage
-      logger?.log(`Using og:image as recipe image`)
+    if (!recipe.image && imageHint) {
+      recipe.image = imageHint
+      logger?.log(`Using selected page image for recipe image`)
     }
 
     logger?.log(`✅ Recipe extraction complete:`, {

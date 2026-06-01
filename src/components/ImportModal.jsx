@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { fetchHTML, extractRecipeFromHTML, validateRecipe, Logger } from '../lib/gemini'
 import { updateRecipes } from '../lib/github'
 
+function blankIngredient() {
+  return { amount: '', unit: '', name: '' }
+}
+
 function LogViewer({ logs, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -50,11 +54,68 @@ export default function ImportModal({ onClose, onSuccess }) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [results, setResults] = useState([])
   const [selectedLog, setSelectedLog] = useState(null)
+  const [reviewMode, setReviewMode] = useState(false)
+  const [reviewRecipes, setReviewRecipes] = useState([])
+  const [reviewIndex, setReviewIndex] = useState(0)
 
   const urls = urlsInput
     .split('\n')
     .map(url => url.trim())
     .filter(url => url && /^https?:\/\//.test(url))
+
+  const successfulResults = results.filter(r => r.status === 'success' && r.recipe)
+  const failedResults = results.filter(r => r.status === 'error')
+  const currentRecipe = reviewRecipes[reviewIndex] || null
+
+  function cloneRecipe(recipe) {
+    return {
+      ...recipe,
+      tags: Array.isArray(recipe.tags) ? [...recipe.tags] : [],
+      ingredients: Array.isArray(recipe.ingredients)
+        ? recipe.ingredients.map(ing => ({
+            amount: ing?.amount ?? '',
+            unit: ing?.unit ?? '',
+            name: ing?.name ?? '',
+          }))
+        : [blankIngredient()],
+      steps: Array.isArray(recipe.steps) ? [...recipe.steps] : [''],
+      description: recipe.description || '',
+    }
+  }
+
+  function startReview(importResults) {
+    const ok = importResults
+      .filter(r => r.status === 'success' && r.recipe)
+      .map(r => cloneRecipe(r.recipe))
+
+    if (ok.length === 0) return
+
+    setReviewRecipes(ok)
+    setReviewIndex(0)
+    setReviewMode(true)
+  }
+
+  function updateCurrentRecipe(updater) {
+    setReviewRecipes(prev =>
+      prev.map((recipe, i) => (i === reviewIndex ? updater(recipe) : recipe))
+    )
+  }
+
+  function updateIngredient(i, key, value) {
+    updateCurrentRecipe(recipe => {
+      const ingredients = [...(recipe.ingredients || [])]
+      ingredients[i] = { ...ingredients[i], [key]: value }
+      return { ...recipe, ingredients }
+    })
+  }
+
+  function updateStep(i, value) {
+    updateCurrentRecipe(recipe => {
+      const steps = [...(recipe.steps || [])]
+      steps[i] = value
+      return { ...recipe, steps }
+    })
+  }
 
   async function handleImport() {
     if (!apiKey.trim()) {
@@ -68,6 +129,11 @@ export default function ImportModal({ onClose, onSuccess }) {
 
     setIsProcessing(true)
     setResults([])
+    setReviewMode(false)
+    setReviewRecipes([])
+    setReviewIndex(0)
+
+    const finalResults = []
 
     for (const url of urls) {
       const logger = new Logger(url)
@@ -91,6 +157,7 @@ export default function ImportModal({ onClose, onSuccess }) {
         validateRecipe(recipe, logger)
 
         logger.log(`✅ SUCCESS: Recipe imported successfully`)
+        finalResults.push({ ...result, status: 'success', recipe })
         setResults(prev =>
           prev.map(r =>
             r.url === url ? { ...r, status: 'success', recipe } : r
@@ -99,6 +166,7 @@ export default function ImportModal({ onClose, onSuccess }) {
       } catch (err) {
         const error = err.message || 'Unknown error'
         logger.log(`❌ FAILED: ${error}`)
+        finalResults.push({ ...result, status: 'error', error })
         setResults(prev =>
           prev.map(r =>
             r.url === url ? { ...r, status: 'error', error } : r
@@ -108,12 +176,34 @@ export default function ImportModal({ onClose, onSuccess }) {
     }
 
     setIsProcessing(false)
+    setResults(finalResults)
+    startReview(finalResults)
   }
 
   async function handleAddRecipes() {
-    const recipesToAdd = results
-      .filter(r => r.status === 'success' && r.recipe)
-      .map(r => r.recipe)
+    const recipesToAdd = (reviewMode ? reviewRecipes : successfulResults.map(r => r.recipe)).map(recipe => ({
+      ...recipe,
+      title: String(recipe.title || '').trim(),
+      description: String(recipe.description || '').trim(),
+      servings: Number(recipe.servings) > 0 ? Number(recipe.servings) : 1,
+      prep_min: Number(recipe.prep_min) >= 0 ? Number(recipe.prep_min) : 0,
+      cook_min: Number(recipe.cook_min) >= 0 ? Number(recipe.cook_min) : 0,
+      tags: Array.isArray(recipe.tags)
+        ? recipe.tags.map(t => String(t).trim()).filter(Boolean)
+        : [],
+      ingredients: Array.isArray(recipe.ingredients)
+        ? recipe.ingredients
+            .map(ing => ({
+              amount: ing?.amount ?? '',
+              unit: String(ing?.unit ?? '').trim(),
+              name: String(ing?.name ?? '').trim(),
+            }))
+            .filter(ing => ing.name)
+        : [],
+      steps: Array.isArray(recipe.steps)
+        ? recipe.steps.map(s => String(s || '').trim()).filter(Boolean)
+        : [],
+    }))
 
     if (recipesToAdd.length === 0) {
       alert('No recipes to add')
@@ -153,6 +243,289 @@ export default function ImportModal({ onClose, onSuccess }) {
           </div>
 
           <div className="px-6 py-4 space-y-4">
+            {reviewMode && currentRecipe && (
+              <div className="space-y-4">
+                <div className="border rounded-lg p-3 bg-gray-50 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setReviewIndex(i => Math.max(0, i - 1))}
+                      disabled={reviewIndex === 0 || isProcessing}
+                      className="px-3 py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-800
+                                 hover:bg-gray-100 disabled:opacity-40"
+                    >
+                      ← Prev
+                    </button>
+                    <p className="text-sm font-medium text-gray-700">
+                      Recipe {reviewIndex + 1} of {reviewRecipes.length}
+                    </p>
+                    <button
+                      onClick={() => setReviewIndex(i => Math.min(reviewRecipes.length - 1, i + 1))}
+                      disabled={reviewIndex === reviewRecipes.length - 1 || isProcessing}
+                      className="px-3 py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-800
+                                 hover:bg-gray-100 disabled:opacity-40"
+                    >
+                      Next →
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleAddRecipes}
+                    disabled={isProcessing || reviewRecipes.length === 0}
+                    className="w-full bg-[#143109] text-white py-2 rounded text-sm font-semibold
+                               hover:opacity-90 disabled:opacity-40 transition-colors"
+                  >
+                    Add {reviewRecipes.length} Recipe{reviewRecipes.length !== 1 ? 's' : ''}
+                  </button>
+                </div>
+
+                <div className="space-y-3 border rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-gray-900">Manual Review</h3>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Title</label>
+                    <input
+                      value={currentRecipe.title || ''}
+                      onChange={e => updateCurrentRecipe(recipe => ({ ...recipe, title: e.target.value }))}
+                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                    <textarea
+                      value={currentRecipe.description || ''}
+                      onChange={e => updateCurrentRecipe(recipe => ({ ...recipe, description: e.target.value }))}
+                      rows={2}
+                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Servings</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={currentRecipe.servings ?? ''}
+                        onChange={e => updateCurrentRecipe(recipe => ({ ...recipe, servings: e.target.value }))}
+                        className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Prep (min)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={currentRecipe.prep_min ?? ''}
+                        onChange={e => updateCurrentRecipe(recipe => ({ ...recipe, prep_min: e.target.value }))}
+                        className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Cook (min)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={currentRecipe.cook_min ?? ''}
+                        onChange={e => updateCurrentRecipe(recipe => ({ ...recipe, cook_min: e.target.value }))}
+                        className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Tags (comma-separated)</label>
+                    <input
+                      value={Array.isArray(currentRecipe.tags) ? currentRecipe.tags.join(', ') : ''}
+                      onChange={e => {
+                        const tags = e.target.value
+                          .split(',')
+                          .map(t => t.trim().toLowerCase())
+                          .filter(Boolean)
+                        updateCurrentRecipe(recipe => ({ ...recipe, tags }))
+                      }}
+                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-gray-600">Ingredients</label>
+                      <button
+                        onClick={() =>
+                          updateCurrentRecipe(recipe => ({
+                            ...recipe,
+                            ingredients: [...(recipe.ingredients || []), blankIngredient()],
+                          }))
+                        }
+                        className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-100"
+                      >
+                        + Add Ingredient
+                      </button>
+                    </div>
+
+                    {(currentRecipe.ingredients || []).map((ing, i) => (
+                      <div key={i} className="grid grid-cols-[1fr_1fr_3fr_auto] gap-2">
+                        <input
+                          placeholder="Amount"
+                          value={ing.amount ?? ''}
+                          onChange={e => updateIngredient(i, 'amount', e.target.value)}
+                          className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                        />
+                        <input
+                          placeholder="Unit"
+                          value={ing.unit || ''}
+                          onChange={e => updateIngredient(i, 'unit', e.target.value)}
+                          className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                        />
+                        <input
+                          placeholder="Ingredient name"
+                          value={ing.name || ''}
+                          onChange={e => updateIngredient(i, 'name', e.target.value)}
+                          className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                        />
+                        <button
+                          onClick={() =>
+                            updateCurrentRecipe(recipe => ({
+                              ...recipe,
+                              ingredients: (recipe.ingredients || []).filter((_, idx) => idx !== i),
+                            }))
+                          }
+                          className="px-2 rounded border border-red-200 text-red-700 text-xs hover:bg-red-50"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-gray-600">Steps</label>
+                      <button
+                        onClick={() =>
+                          updateCurrentRecipe(recipe => ({
+                            ...recipe,
+                            steps: [...(recipe.steps || []), ''],
+                          }))
+                        }
+                        className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-100"
+                      >
+                        + Add Step
+                      </button>
+                    </div>
+
+                    {(currentRecipe.steps || []).map((step, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <p className="text-xs text-gray-500 mt-2 w-5">{i + 1}.</p>
+                        <textarea
+                          value={step}
+                          onChange={e => updateStep(i, e.target.value)}
+                          rows={2}
+                          className="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm"
+                        />
+                        <button
+                          onClick={() =>
+                            updateCurrentRecipe(recipe => ({
+                              ...recipe,
+                              steps: (recipe.steps || []).filter((_, idx) => idx !== i),
+                            }))
+                          }
+                          className="px-2 py-1 mt-0.5 rounded border border-red-200 text-red-700 text-xs hover:bg-red-50"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Image URL</label>
+                    <input
+                      value={currentRecipe.image || ''}
+                      onChange={e => updateCurrentRecipe(recipe => ({ ...recipe, image: e.target.value }))}
+                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
+                      placeholder="https://images.example.com/photo.jpg"
+                    />
+                    {currentRecipe.image && /^https?:\/\//.test(currentRecipe.image) && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <img
+                          src={currentRecipe.image}
+                          alt="Imported recipe preview"
+                          loading="lazy"
+                          className="h-14 w-14 rounded border border-gray-200 object-cover"
+                          onError={e => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                        <a
+                          href={currentRecipe.image}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-[#143109] hover:underline break-all"
+                        >
+                          Open image
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Source URL</label>
+                    <input
+                      value={currentRecipe.source || ''}
+                      onChange={e => updateCurrentRecipe(recipe => ({ ...recipe, source: e.target.value }))}
+                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
+                    />
+                  </div>
+                </div>
+
+                {failedResults.length > 0 && (
+                  <div className="space-y-2 border rounded-lg p-3 bg-red-50">
+                    <p className="text-sm font-medium text-red-800">
+                      {failedResults.length} import{failedResults.length !== 1 ? 's' : ''} failed
+                    </p>
+                    {failedResults.map((result, i) => (
+                      <button
+                        key={i}
+                        onClick={() => result.logger && setSelectedLog(result.logger.getLogs())}
+                        className="w-full text-left border border-red-200 rounded p-2 bg-white hover:shadow-sm"
+                      >
+                        <p className="text-xs text-red-700 font-medium">{result.error}</p>
+                        <p className="text-xs text-gray-500 break-all mt-1">{result.url}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2 border-t">
+                  <button
+                    onClick={() => {
+                      setReviewMode(false)
+                      setReviewRecipes([])
+                      setReviewIndex(0)
+                      setResults([])
+                      setUrlsInput('')
+                    }}
+                    className="flex-1 bg-white text-gray-700 border border-gray-200 py-2 rounded text-sm font-medium
+                               hover:bg-gray-50 transition-colors"
+                  >
+                    Import More
+                  </button>
+                  <button
+                    onClick={handleAddRecipes}
+                    disabled={isProcessing || reviewRecipes.length === 0}
+                    className="flex-1 bg-[#143109] text-white py-2 rounded text-sm font-medium
+                               hover:opacity-90 disabled:opacity-40 transition-colors"
+                  >
+                    Add {reviewRecipes.length} Recipe{reviewRecipes.length !== 1 ? 's' : ''}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!reviewMode && (
+              <>
             {/* API Key Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -269,16 +642,18 @@ export default function ImportModal({ onClose, onSuccess }) {
                     Import More
                   </button>
                   <button
-                    onClick={handleAddRecipes}
-                    disabled={isProcessing || results.filter(r => r.status === 'success').length === 0}
+                    onClick={() => startReview(results)}
+                    disabled={isProcessing || successfulResults.length === 0}
                     className="flex-1 bg-[#143109] text-white py-2 rounded text-sm font-medium
                                hover:opacity-90 disabled:opacity-40 transition-colors"
                   >
-                    Add {results.filter(r => r.status === 'success').length} Recipe
-                    {results.filter(r => r.status === 'success').length !== 1 ? 's' : ''}
+                    Review {successfulResults.length} Recipe
+                    {successfulResults.length !== 1 ? 's' : ''}
                   </button>
                 </div>
               </div>
+            )}
+              </>
             )}
           </div>
         </div>

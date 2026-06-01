@@ -4,13 +4,9 @@ const GEMINI_LIST_MODELS_URL = 'https://generativelanguage.googleapis.com/v1beta
 const GEMINI_MODELS = [
   'gemini-2.5-flash',
   'gemini-2.5-flash-lite',
-  'gemini-2.0-flash',
-  'gemini-2.0-flash-lite',
-  'gemini-1.5-flash-8b-latest',
-  'gemini-1.5-flash-latest',
 ]
 const FETCH_TIMEOUT_MS = 20000
-const MAX_MODEL_INPUT_CHARS = 5000
+const MAX_MODEL_INPUT_CHARS = 25000
 
 /**
  * Simple logger class to capture all operations
@@ -103,9 +99,55 @@ function getFetchAttempts(url) {
   ]
 }
 
-function compressTextForPrompt(text) {
-  // Reduce prompt size without losing key semantics from fetched content.
-  return text.replace(/\s+/g, ' ').trim().slice(0, MAX_MODEL_INPUT_CHARS)
+function compressTextForPrompt(text, logger) {
+  // Preserve line structure to keep ingredient and method lists parseable.
+  const normalized = text
+    .replace(/\r\n/g, '\n')
+    .replace(/\t/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+
+  const lower = normalized.toLowerCase()
+  const hasIngredients = lower.includes('ingredients')
+  const hasIngridientsTypo = lower.includes('ingridients')
+  const hasMethod = lower.includes('method') || lower.includes('instructions')
+
+  logger?.log(
+    `Content signals: ingredients=${hasIngredients}, ingridients=${hasIngridientsTypo}, method=${hasMethod}`
+  )
+
+  const ingredientHeader = /(^|\n)#{1,6}\s*ingredients\b/i
+  const methodHeader = /(^|\n)#{1,6}\s*(method|instructions?)\b/i
+
+  const ingMatch = ingredientHeader.exec(normalized)
+  const methodMatch = methodHeader.exec(normalized)
+
+  // Keep useful top-of-page context (title/subtitle), then prioritize recipe sections.
+  const head = normalized.slice(0, 2500)
+
+  const sections = []
+  if (ingMatch) {
+    const start = Math.max(0, ingMatch.index - 500)
+    const end = Math.min(normalized.length, ingMatch.index + 5000)
+    sections.push(normalized.slice(start, end))
+  }
+
+  if (methodMatch) {
+    const start = Math.max(0, methodMatch.index - 500)
+    const end = Math.min(normalized.length, methodMatch.index + 5000)
+    sections.push(normalized.slice(start, end))
+  }
+
+  let combined = [head, ...sections].filter(Boolean).join('\n\n---\n\n')
+
+  if (combined.length < 4000) {
+    // Fallback if section headers were not found in this source format.
+    combined = normalized.slice(0, MAX_MODEL_INPUT_CHARS)
+  }
+
+  const finalText = combined.slice(0, MAX_MODEL_INPUT_CHARS)
+  logger?.log(`Prepared model input length: ${finalText.length} chars`)
+  return finalText
 }
 
 function stripCodeFences(text) {
@@ -288,7 +330,7 @@ ${ogImage ? `- The og:image URL is: ${ogImage}` : ''}
 - Return ONLY the JSON object, nothing else
 - Do not wrap output in markdown or code fences`
 
-    const compactInput = compressTextForPrompt(html)
+    const compactInput = compressTextForPrompt(html, logger)
     const userPrompt = `Extract the recipe from this HTML/text snapshot:\n\n${compactInput}`
 
     const candidateModels = await getCandidateModels(apiKey, logger)

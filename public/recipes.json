@@ -206,6 +206,7 @@
     "cook_min": 0,
     "tags": [
       "asian",
+      "healthy",
       "salad"
     ],
     "steps": [
@@ -412,7 +413,7 @@
       {
         "amount": 4,
         "unit": "tbsp",
-        "name": "tomato purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e"
+        "name": "tomato pure"
       },
       {
         "amount": 400,
@@ -546,7 +547,7 @@
     "prep_min": 10,
     "cook_min": 5,
     "tags": [
-      "quick"
+      "asian"
     ],
     "steps": [
       "Mix the bibimbap sauce ingredients together in a small bowl with 1 tbsp water and set aside.",
@@ -641,8 +642,8 @@
     "prep_min": 20,
     "cook_min": 0,
     "tags": [
-      "salad",
-      "healthy"
+      "healthy",
+      "salad"
     ],
     "steps": [
       "For The Lemon Dressing: Using a wire whisk, whisk the ingredients together in a medium size bowl. You can also toss everything in a blender and blend for 30 seconds until its nice a creamy.",

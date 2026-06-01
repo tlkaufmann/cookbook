@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { fetchRecipes, updateRecipes } from '../lib/github'
+import { getRecipes, updateRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
 
 const UNITS = ['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', '']
@@ -29,7 +29,7 @@ export default function RecipeForm() {
   const [loading, setLoading] = useState(isEditing)
 
   useEffect(() => {
-    fetchRecipes().then(data => {
+    getRecipes().then(({ data }) => {
       const tags = new Set()
       data.forEach(r => r.tags?.forEach(t => tags.add(t)))
       setAllTags([...tags].sort())

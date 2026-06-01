@@ -59,6 +59,25 @@ const RECIPE_SCHEMA = {
   image: 'URL of main recipe image (from og:image if available)',
 }
 
+const SHOPPING_SCHEMA = {
+  normal_items: [
+    {
+      name: 'string',
+      amount: 'string',
+      unit: 'string',
+      note: 'string',
+    },
+  ],
+  bulk_items: [
+    {
+      name: 'string',
+      amount: 'string',
+      unit: 'string',
+      note: 'string',
+    },
+  ],
+}
+
 /**
  * Extract Open Graph image URL from HTML
  */
@@ -563,6 +582,92 @@ ${imageHint ? `- Preferred image URL for this page is: ${imageHint}` : ''}
     logger?.log(`❌ Final Error: ${err.message}`)
     throw new Error(err.message)
   }
+}
+
+export async function consolidateShoppingItems(items, apiKey, logger) {
+  const systemPrompt = `You normalize and consolidate shopping list items. Return ONLY valid JSON.
+
+The JSON must follow exactly this schema:
+${JSON.stringify(SHOPPING_SCHEMA, null, 2)}
+
+Rules:
+- Merge items only when they clearly refer to the same ingredient.
+- Sum amounts only if the units are compatible and the merge is unambiguous.
+- Preserve separate rows when the merge would be risky.
+- Normalize obvious spelling variants like scallions/spring onions when appropriate.
+- Split output into two groups:
+  - normal_items: usual items expected to buy this week
+  - bulk_items: pantry/bulk staples like spices, oils, vinegars, salt, pepper, flour, sugar, dry stock where restocking is less frequent
+- Keep amount and unit as strings.
+- Keep note short and useful.
+- Return ONLY the JSON object, nothing else.`
+
+  const userPrompt = `Consolidate this shopping list:\n\n${JSON.stringify(items, null, 2)}`
+  const candidateModels = await getCandidateModels(apiKey, logger)
+
+  let data = null
+  let lastError = null
+
+  for (const model of candidateModels) {
+    const endpoint = `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`
+    logger?.log(`Trying shopping consolidation model: ${model}`)
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: userPrompt }],
+            role: 'user',
+          },
+        ],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+      }),
+    })
+
+    if (response.ok) {
+      data = await response.json()
+      break
+    }
+
+    const error = await response.json().catch(() => ({}))
+    lastError = error?.error?.message || `HTTP ${response.status}`
+
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(lastError)
+    }
+  }
+
+  if (!data) {
+    throw new Error(lastError || 'All Gemini models failed')
+  }
+
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text
+  if (!content) throw new Error('No response from Gemini')
+
+  const payload = parseModelJson(content, logger)
+  if (!Array.isArray(payload?.normal_items) || !Array.isArray(payload?.bulk_items)) {
+    throw new Error('Invalid shopping list response from Gemini')
+  }
+
+  const normalItems = normalizeTextDeep(payload.normal_items).map(item => ({
+    name: String(item.name || '').trim(),
+    amount: String(item.amount || '').trim(),
+    unit: String(item.unit || '').trim(),
+    note: String(item.note || '').trim(),
+    category: 'normal',
+  }))
+
+  const bulkItems = normalizeTextDeep(payload.bulk_items).map(item => ({
+    name: String(item.name || '').trim(),
+    amount: String(item.amount || '').trim(),
+    unit: String(item.unit || '').trim(),
+    note: String(item.note || '').trim(),
+    category: 'bulk',
+  }))
+
+  return [...normalItems, ...bulkItems]
 }
 
 /**

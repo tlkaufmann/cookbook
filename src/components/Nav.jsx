@@ -6,7 +6,7 @@ import DeployBadge from './DeployBadge'
 const LINKS = [
   { to: '/', label: 'Recipes' },
   { to: '/planner', label: 'Planner' },
-  { to: '/shopping', label: 'Shopping' },
+  { to: '/tags', label: 'Tags' },
 ]
 
 export default function Nav() {

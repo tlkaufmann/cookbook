@@ -2,6 +2,54 @@ const OWNER = 'tlkaufmann'
 const REPO = 'cookbook'
 const BRANCH = 'main'
 
+const MOJIBAKE_PATTERN = /Ã.|Â.|â[\u0080-\u00BF]/
+
+function looksMojibake(value) {
+  return typeof value === 'string' && MOJIBAKE_PATTERN.test(value)
+}
+
+function decodeLatin1AsUtf8(value) {
+  try {
+    const bytes = new Uint8Array([...value].map(ch => ch.charCodeAt(0) & 0xff))
+    return new TextDecoder('utf-8', { fatal: false }).decode(bytes)
+  } catch {
+    return value
+  }
+}
+
+function fixMojibakeText(value) {
+  if (!looksMojibake(value)) return value
+
+  let next = value
+  for (let i = 0; i < 2; i += 1) {
+    const decoded = decodeLatin1AsUtf8(next)
+    if (decoded === next) break
+    next = decoded
+    if (!looksMojibake(next)) break
+  }
+
+  // Final safety replacements for common quote/dash artifacts.
+  return next
+    .replace(/â€™/g, "'")
+    .replace(/â€˜/g, "'")
+    .replace(/â€œ/g, '"')
+    .replace(/â€/g, '"')
+    .replace(/â€“/g, '-')
+    .replace(/â€”/g, '-')
+    .replace(/Â/g, '')
+}
+
+function normalizeTextDeep(value) {
+  if (typeof value === 'string') return fixMojibakeText(value)
+  if (Array.isArray(value)) return value.map(normalizeTextDeep)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, val]) => [key, normalizeTextDeep(val)])
+    )
+  }
+  return value
+}
+
 function token() {
   return localStorage.getItem('gh_pat')
 }
@@ -18,7 +66,7 @@ async function readFile(path) {
   }
   if (!res.ok) throw new Error(`GitHub read failed: ${path} (${res.status})`)
   const { content, sha } = await res.json()
-  return { data: JSON.parse(atob(content)), sha }
+  return { data: normalizeTextDeep(JSON.parse(atob(content))), sha }
 }
 
 async function writeFile(path, data, sha, message) {
@@ -58,7 +106,8 @@ function isShaConflict(error) {
 export async function fetchRecipes() {
   const res = await fetch(`${import.meta.env.BASE_URL}recipes.json?t=${Date.now()}`)
   if (!res.ok) return []
-  return res.json()
+  const data = await res.json()
+  return normalizeTextDeep(data)
 }
 
 // --- Authenticated API access (for planner and recipe form writes) ---
@@ -77,7 +126,7 @@ function enqueueUpdate(path, updateFn) {
     // another client/tab/process between read and write.
     for (let attempt = 1; attempt <= 3; attempt++) {
       const { data, sha } = await readFile(path)
-      const newData = await updateFn(data)
+      const newData = normalizeTextDeep(await updateFn(normalizeTextDeep(data)))
       try {
         return await writeFile(path, newData, sha, `Update ${path.split('/').pop()}`)
       } catch (error) {

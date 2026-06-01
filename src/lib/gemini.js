@@ -274,7 +274,56 @@ function parseModelJson(content, logger) {
   throw lastParseError || new Error('Unable to parse JSON')
 }
 
+const MOJIBAKE_PATTERN = /Ã.|Â.|â[\u0080-\u00BF]/
+
+function looksMojibake(value) {
+  return typeof value === 'string' && MOJIBAKE_PATTERN.test(value)
+}
+
+function decodeLatin1AsUtf8(value) {
+  try {
+    const bytes = new Uint8Array([...value].map(ch => ch.charCodeAt(0) & 0xff))
+    return new TextDecoder('utf-8', { fatal: false }).decode(bytes)
+  } catch {
+    return value
+  }
+}
+
+function fixMojibakeText(value) {
+  if (!looksMojibake(value)) return value
+
+  let next = value
+  for (let i = 0; i < 2; i += 1) {
+    const decoded = decodeLatin1AsUtf8(next)
+    if (decoded === next) break
+    next = decoded
+    if (!looksMojibake(next)) break
+  }
+
+  return next
+    .replace(/â€™/g, "'")
+    .replace(/â€˜/g, "'")
+    .replace(/â€œ/g, '"')
+    .replace(/â€/g, '"')
+    .replace(/â€“/g, '-')
+    .replace(/â€”/g, '-')
+    .replace(/Â/g, '')
+}
+
+function normalizeTextDeep(value) {
+  if (typeof value === 'string') return fixMojibakeText(value)
+  if (Array.isArray(value)) return value.map(normalizeTextDeep)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, val]) => [key, normalizeTextDeep(val)])
+    )
+  }
+  return value
+}
+
 function normalizeRecipe(recipe, logger) {
+  recipe = normalizeTextDeep(recipe)
+
   if (!Array.isArray(recipe.ingredients)) return recipe
 
   const knownUnits = new Set(['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', ''])

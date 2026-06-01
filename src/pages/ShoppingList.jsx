@@ -22,14 +22,20 @@ function buildList(plan, recipes, dateRange) {
 
       for (const ing of (recipe.ingredients || [])) {
         const key = ing.name.toLowerCase()
+        const numAmt = parseFloat(ing.amount)
+        const hasAmt = !isNaN(numAmt) && numAmt > 0
+
         if (!totals[key]) {
-          totals[key] = { name: ing.name, unit: ing.unit, amount: 0, conflict: false }
+          totals[key] = { name: ing.name, unit: ing.unit, amount: 0, hasAmount: false, conflict: false }
         }
+        if (!hasAmt) continue
+
         if (totals[key].unit !== ing.unit && !totals[key].conflict) {
           totals[key].conflict = true
-          totals[key].conflictNote = `${parseFloat(totals[key].amount.toFixed(2))}${totals[key].unit || ''} + ${parseFloat((ing.amount * scale).toFixed(2))}${ing.unit || ''}`
+          totals[key].conflictNote = `${parseFloat(totals[key].amount.toFixed(2))}${totals[key].unit || ''} + ${parseFloat((numAmt * scale).toFixed(2))}${ing.unit || ''}`
         } else if (!totals[key].conflict) {
-          totals[key].amount += ing.amount * scale
+          totals[key].amount += numAmt * scale
+          totals[key].hasAmount = true
         }
       }
     }
@@ -67,7 +73,7 @@ export default function ShoppingList() {
       .filter(i => !checked.has(i.name))
       .map(i => i.conflict
         ? `⚠ ${i.name} — ${i.conflictNote} (check units)`
-        : `${parseFloat(i.amount.toFixed(2))}${i.unit ? ' ' + i.unit : ''} ${i.name}`)
+        : `${i.hasAmount ? `${parseFloat(i.amount.toFixed(2))}${i.unit ? ' ' + i.unit : ''} ` : ''}${i.name}`)
       .join('\n')
     navigator.clipboard.writeText(text)
   }
@@ -115,7 +121,9 @@ export default function ShoppingList() {
             ) : (
               <p className={`text-sm text-gray-800 ${checked.has(item.name) ? 'line-through' : ''}`}>
                 <span className="font-medium tabular-nums">
-                  {parseFloat(item.amount.toFixed(2))}{item.unit ? ` ${item.unit}` : ''}
+                  {item.hasAmount
+                    ? `${parseFloat(item.amount.toFixed(2))}${item.unit ? ' ' + item.unit : ''}`
+                    : '—'}
                 </span>{' '}
                 {item.name}
               </p>

@@ -4,10 +4,10 @@ import { fetchRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
 
 function formatAmount(amount, scale) {
-  const scaled = amount * scale
-  const rounded = parseFloat(scaled.toFixed(2))
-  // Drop unnecessary decimal zeros: 2.00 -> 2, 0.50 -> 0.5
-  return rounded
+  const n = parseFloat(amount)
+  if (!n || isNaN(n)) return null
+  const scaled = n * scale
+  return parseFloat(scaled.toFixed(2))
 }
 
 export default function RecipeDetail() {
@@ -115,15 +115,19 @@ export default function RecipeDetail() {
             Ingredients
           </h2>
           <ul className="space-y-2">
-            {recipe.ingredients?.map((ing, i) => (
-              <li key={i} className="flex gap-2 text-sm text-gray-700">
-                <span className="font-medium text-gray-900 shrink-0 tabular-nums">
-                  {formatAmount(ing.amount, scale)}
-                  {ing.unit ? ` ${ing.unit}` : ''}
-                </span>
-                <span>{ing.name}</span>
-              </li>
-            ))}
+            {recipe.ingredients?.map((ing, i) => {
+              const amt = formatAmount(ing.amount, scale)
+              return (
+                <li key={i} className="flex gap-2 text-sm text-gray-700">
+                  <span className="font-medium text-gray-900 shrink-0 tabular-nums">
+                    {amt != null
+                      ? `${amt}${ing.unit ? ` ${ing.unit}` : ''}`
+                      : '—'}
+                  </span>
+                  <span>{ing.name}</span>
+                </li>
+              )
+            })}
           </ul>
         </div>
 

@@ -98,7 +98,14 @@ export default function RecipeForm() {
           return [...recipes, { ...form, id: targetId, created_at: new Date().toISOString() }]
         }
       })
-      navigate(`/recipe/${targetId}`, { replace: true })
+      navigate('/', {
+        replace: true,
+        state: {
+          actionNotice: isEditing
+            ? 'Recipe updated. Changes appear after GitHub Actions finishes (usually about 2 minutes).'
+            : 'Recipe added. It may take about 2 minutes until it appears on the live site.',
+        },
+      })
     } catch (e) {
       setError(e.message)
       setSaving(false)
@@ -116,7 +123,12 @@ export default function RecipeForm() {
     try {
       await updateRecipes(recipes => recipes.filter(r => r.id !== id))
 
-      navigate('/', { replace: true })
+      navigate('/', {
+        replace: true,
+        state: {
+          actionNotice: 'Recipe deleted. The live site updates after GitHub Actions finishes (usually about 2 minutes).',
+        },
+      })
     } catch (e) {
       setError(e.message)
       setDeleting(false)

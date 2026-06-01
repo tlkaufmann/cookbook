@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { fetchRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
 
 export default function RecipeList() {
+  const location = useLocation()
   const [recipes, setRecipes] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [activeTags, setActiveTags] = useState(new Set())
+  const notice = location.state?.actionNotice
 
   useEffect(() => {
     fetchRecipes().then(data => {
@@ -49,6 +51,23 @@ export default function RecipeList() {
 
   return (
     <div className="space-y-6">
+      {notice && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-medium">{notice}</p>
+          <p className="mt-1 text-amber-800">
+            Follow deployment progress here:{' '}
+            <a
+              href="https://github.com/tlkaufmann/cookbook/actions/workflows/deploy.yml"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:no-underline"
+            >
+              https://github.com/tlkaufmann/cookbook/actions/workflows/deploy.yml
+            </a>
+          </p>
+        </div>
+      )}
+
       <input
         type="search"
         placeholder="Search recipes or ingredients…"

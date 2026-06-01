@@ -57,6 +57,7 @@ export default function ImportModal({ onClose, onSuccess }) {
   const [reviewMode, setReviewMode] = useState(false)
   const [reviewRecipes, setReviewRecipes] = useState([])
   const [reviewIndex, setReviewIndex] = useState(0)
+  const [hasReviewSession, setHasReviewSession] = useState(false)
 
   const urls = urlsInput
     .split('\n')
@@ -92,6 +93,7 @@ export default function ImportModal({ onClose, onSuccess }) {
 
     setReviewRecipes(ok)
     setReviewIndex(0)
+    setHasReviewSession(true)
     setReviewMode(true)
   }
 
@@ -132,6 +134,7 @@ export default function ImportModal({ onClose, onSuccess }) {
     setReviewMode(false)
     setReviewRecipes([])
     setReviewIndex(0)
+    setHasReviewSession(false)
 
     const finalResults = []
 
@@ -181,7 +184,12 @@ export default function ImportModal({ onClose, onSuccess }) {
   }
 
   async function handleAddRecipes() {
-    const recipesToAdd = (reviewMode ? reviewRecipes : successfulResults.map(r => r.recipe)).map(recipe => ({
+    if (!reviewMode || !hasReviewSession || reviewRecipes.length === 0) {
+      alert('Please review imported recipes before adding them')
+      return
+    }
+
+    const recipesToAdd = reviewRecipes.map(recipe => ({
       ...recipe,
       title: String(recipe.title || '').trim(),
       description: String(recipe.description || '').trim(),
@@ -504,6 +512,7 @@ export default function ImportModal({ onClose, onSuccess }) {
                       setReviewMode(false)
                       setReviewRecipes([])
                       setReviewIndex(0)
+                      setHasReviewSession(false)
                       setResults([])
                       setUrlsInput('')
                     }}
@@ -632,6 +641,7 @@ export default function ImportModal({ onClose, onSuccess }) {
                 <div className="flex gap-2 pt-2 border-t">
                   <button
                     onClick={() => {
+                      setHasReviewSession(false)
                       setResults([])
                       setUrlsInput('')
                     }}

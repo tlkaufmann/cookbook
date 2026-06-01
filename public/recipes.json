@@ -353,7 +353,9 @@
     "servings": 8,
     "prep_min": 15,
     "cook_min": 20,
-    "tags": [],
+    "tags": [
+      "quick"
+    ],
     "ingredients": [
       {
         "amount": 1,
@@ -539,8 +541,7 @@
     "prep_min": 10,
     "cook_min": 5,
     "tags": [
-      "asian",
-      "quick"
+      "asian"
     ],
     "ingredients": [
       {

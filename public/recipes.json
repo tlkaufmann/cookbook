@@ -287,7 +287,7 @@
   },
   {
     "title": "Creamy Pasta Gorgonzola Recipe With Mushrooms",
-    "description": "If you love gorgonzola cheese or are a fan of blue cheese in general youÃÂ¢ÃÂÃÂre going to love this pasta gorgonzola with a rich creamy gorgonzola sauce! Gorgonzola is my favorite cheese or at least one of my favorite cheeses (I have many). But you can make this easy vegetarian recipe with another blue cheese if you prefer.",
+    "description": "If you love gorgonzola cheese or are a fan of blue cheese in general youÃÂÃÂ¢ÃÂÃÂÃÂÃÂre going to love this pasta gorgonzola with a rich creamy gorgonzola sauce! Gorgonzola is my favorite cheese or at least one of my favorite cheeses (I have many). But you can make this easy vegetarian recipe with another blue cheese if you prefer.",
     "servings": 4,
     "prep_min": 15,
     "cook_min": 15,
@@ -449,7 +449,7 @@
       {
         "amount": 4,
         "unit": "tbsp",
-        "name": "tomato purée"
+        "name": "tomato purÃ©e"
       },
       {
         "amount": 0.5,
@@ -504,12 +504,176 @@
     ],
     "steps": [
       "To make the salsa, combine the red onions, tomatoes, vinegar, half the parsley and half the oil, then season to taste. Toss the avocado slices with a splash of the lime juice, and set aside.",
-      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purée and spices, and cook for 3-5 mins until the purée turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
+      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purÃ©e and spices, and cook for 3-5 mins until the purÃ©e turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
       "Warm the tortillas following pack instructions and reheat the rice until piping hot. Assemble the burritos by topping the tortillas with the lettuce, vegetable filling and rice. Dot over the avocado slices and soured cream, then fold in one side of the tortillas and roll up. Serve warm, with the salsa on the side."
     ],
     "source": "https://www.bbcgoodfood.com/recipes/veggie-burrito",
     "id": "17803304408110.6225938223696568",
     "created_at": "2026-06-01T16:14:00.811Z",
     "image": "https://images.immediate.co.uk/production/volatile/sites/30/2023/12/211220231703163234.jpeg?quality=90&webp=true"
+  },
+  {
+    "title": "Creamy courgette lasagne",
+    "description": "Enjoy a vegetarian lasagne bursting with spinach and courgette, held together with a creamy mascarpone sauce. It's a filling midweek meal for all the family",
+    "servings": 6,
+    "prep_min": 20,
+    "cook_min": 30,
+    "tags": [
+      "courgette",
+      "lasagne",
+      "vegetarian",
+      "midweek meal",
+      "family"
+    ],
+    "ingredients": [
+      {
+        "amount": 9,
+        "unit": "",
+        "name": "dried lasagne sheets"
+      },
+      {
+        "amount": 1,
+        "unit": "tbsp",
+        "name": "sunflower oil"
+      },
+      {
+        "amount": 1,
+        "unit": "",
+        "name": "onion, finely chopped"
+      },
+      {
+        "amount": 700,
+        "unit": "g",
+        "name": "courgette (about 6), coarsely grated"
+      },
+      {
+        "amount": 2,
+        "unit": "",
+        "name": "garlic cloves, crushed"
+      },
+      {
+        "amount": 250,
+        "unit": "g",
+        "name": "tub ricotta"
+      },
+      {
+        "amount": 50,
+        "unit": "g",
+        "name": "cheddar"
+      },
+      {
+        "amount": 350,
+        "unit": "g",
+        "name": "jar tomato sauce for pasta"
+      }
+    ],
+    "steps": [
+      "Heat oven to 220C/fan 200C/gas 7. Put a pan of water on to boil, then cook the lasagne sheets for about 5 mins until softened, but not cooked through. Rinse in cold water, then drizzle with a little oil to stop them sticking together.",
+      "Meanwhile, heat the oil in a large frying pan, then fry the onion. After 3 mins, add the courgettes and garlic and continue to fry until the courgette has softened and turned bright green. Stir in 2/3 of both the ricotta and the cheddar, then season to taste. Heat the tomato sauce in the microwave for 2 mins on High until hot.",
+      "In a large baking dish, layer up the lasagne, starting with half the courgette mix, then pasta, then tomato sauce. Repeat, top with blobs of the remaining ricotta, then scatter with the rest of the cheddar. Bake on the top shelf for about 10 mins until the pasta is tender and the cheese is golden."
+    ],
+    "source": "https://www.bbcgoodfood.com/recipes/creamy-courgette-lasagne",
+    "image": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/spinach-courgette-lasagne-dd15c74.jpg?quality=90&resize=93,84",
+    "id": "17803310167240.25067100851743174",
+    "created_at": "2026-06-01T16:23:36.724Z"
+  },
+  {
+    "title": "Korean bibimbap",
+    "description": "Bibimbap is a Korean dish of warm rice topped with sautéed seasoned vegetables decorating the top. These vegetables are usually individually cooked and seasoned to ensure maximum flavour and colour from each vegetable. In this recipe, we still use a variety of vegetables but they’re steamed to make things quicker - feel free to substitute for any other vegetables, just make sure to cut them finely so that they all have a similar cooking time. For extra flavour and freshness, you could also add a handful of rocket, watercress or other salad vegetables too.",
+    "servings": 1,
+    "prep_min": 10,
+    "cook_min": 5,
+    "tags": [
+      "korean",
+      "bibimbap",
+      "vegetarian",
+      "rice",
+      "egg",
+      "vegetables",
+      "quick"
+    ],
+    "ingredients": [
+      {
+        "amount": 1,
+        "unit": "",
+        "name": "chestnut mushroom, finely sliced"
+      },
+      {
+        "amount": 0.5,
+        "unit": "",
+        "name": "courgette, halved and finely sliced"
+      },
+      {
+        "amount": 0.25,
+        "unit": "",
+        "name": "carrot, cut into think matchsticks"
+      },
+      {
+        "amount": 40,
+        "unit": "g",
+        "name": "beansprouts"
+      },
+      {
+        "amount": 30,
+        "unit": "g",
+        "name": "spinach"
+      },
+      {
+        "amount": 0.25,
+        "unit": "tsp",
+        "name": "sesame oil, plus extra to serve"
+      },
+      {
+        "amount": 0.5,
+        "unit": "tsp",
+        "name": "sesame seeds, plus extra to serve"
+      },
+      {
+        "amount": 2,
+        "unit": "tbsp",
+        "name": "vegetable oil"
+      },
+      {
+        "amount": 1,
+        "unit": "",
+        "name": "egg"
+      },
+      {
+        "amount": 150,
+        "unit": "g",
+        "name": "cooked sushi rice"
+      },
+      {
+        "amount": 2,
+        "unit": "tbsp",
+        "name": "gochujang (Korean red pepper paste)"
+      },
+      {
+        "amount": 1,
+        "unit": "tsp",
+        "name": "sesame seeds (for sauce)"
+      },
+      {
+        "amount": 1,
+        "unit": "tsp",
+        "name": "caster sugar (for sauce)"
+      },
+      {
+        "amount": 0.5,
+        "unit": "tsp",
+        "name": "sesame oil (for sauce)"
+      }
+    ],
+    "steps": [
+      "Mix the bibimbap sauce ingredients together in a small bowl with 1 tbsp water and set aside.",
+      "Put the sliced mushroom, courgette, carrot and beansprouts on a plate. Put a small heatproof bowl or ramekin upside down in the middle of a medium lidded pan. Add enough water to come halfway up the ramekin and bring to a boil. Carefully put the plate of vegetables on top of the ramekin and put a lid on the pan. Steam the vegetables for 3 mins until tender.",
+      "Meanwhile, put the spinach in a bowl and pour boiling water over the top. Stir to wilt the leaves, then drain and rinse under cold water. Squeeze any excess water from the spinach, then mix in a bowl with the sesame oil, a pinch of salt and sesame seeds. Set aside.",
+      "Heat the vegetable oil in a frying pan over a high heat. Crack in the egg and fry to your liking.",
+      "Fill a bowl with the rice. Top with the fried egg, then use tongs to add the steamed vegetables around it. Serve with the bibimbap sauce, a little extra sesame oil and sesame seeds. Mix everything together before eating."
+    ],
+    "source": "https://www.bbcgoodfood.com/recipes/korean-bibimbap",
+    "image": null,
+    "id": "17803310167240.22924099762024763",
+    "created_at": "2026-06-01T16:23:36.724Z"
   }
 ]

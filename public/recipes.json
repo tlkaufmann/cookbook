@@ -90,7 +90,7 @@
       "Make a quick tomato sauce with garlic, tomatoes, vinegar and basil.",
       "Layer aubergine, sauce, mozzarella and Parmesan, then bake until browned."
     ],
-    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcSmjQziV6Bzm_Kq4tT_4owmjgIzwMR57viQ&s",
+    "image": "https://cooksimply.co.uk/wp-content/uploads/2023/03/aubergine-parmigiana-cook-simply.jpg",
     "source": "https://cooksimply.co.uk/aubergine-parmigiana-recipe/",
     "created_at": "2026-06-01T11:09:33.769Z"
   },
@@ -405,7 +405,7 @@
       {
         "amount": 4,
         "unit": "tbsp",
-        "name": "tomato purÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e"
+        "name": "tomato purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e"
       },
       {
         "amount": 0.5,
@@ -460,7 +460,7 @@
     ],
     "steps": [
       "To make the salsa, combine the red onions, tomatoes, vinegar, half the parsley and half the oil, then season to taste. Toss the avocado slices with a splash of the lime juice, and set aside.",
-      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e and spices, and cook for 3-5 mins until the purÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
+      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e and spices, and cook for 3-5 mins until the purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
       "Warm the tortillas following pack instructions and reheat the rice until piping hot. Assemble the burritos by topping the tortillas with the lettuce, vegetable filling and rice. Dot over the avocado slices and soured cream, then fold in one side of the tortillas and roll up. Serve warm, with the salsa on the side."
     ],
     "source": "https://www.bbcgoodfood.com/recipes/veggie-burrito",
@@ -529,7 +529,7 @@
   },
   {
     "title": "Korean bibimbap",
-    "description": "Bibimbap is a Korean dish of warm rice topped with sautÃ©ed seasoned vegetables decorating the top. These vegetables are usually individually cooked and seasoned to ensure maximum flavour and colour from each vegetable. In this recipe, we still use a variety of vegetables but theyÃ¢ÂÂre steamed to make things quicker - feel free to substitute for any other vegetables, just make sure to cut them finely so that they all have a similar cooking time. For extra flavour and freshness, you could also add a handful of rocket, watercress or other salad vegetables too.",
+    "description": "Bibimbap is a Korean dish of warm rice topped with sauteed seasoned vegetables decorating the top. These vegetables are usually individually cooked and seasoned to ensure maximum flavour and colour from each vegetable. In this recipe, we still use a variety of vegetables but they’re steamed to make things quicker - feel free to substitute for any other vegetables, just make sure to cut them finely so that they all have a similar cooking time. For extra flavour and freshness, you could also add a handful of rocket, watercress or other salad vegetables too.",
     "servings": 1,
     "prep_min": 10,
     "cook_min": 5,
@@ -619,5 +619,111 @@
     "image": "https://images.immediate.co.uk/production/volatile/sites/30/2024/09/BibimbapKoreanMixedRice-6a656fe.jpg?quality=90&webp=true&resize=900,817",
     "id": "17803310167240.22924099762024763",
     "created_at": "2026-06-01T16:23:36.724Z"
+  },
+  {
+    "title": "White Bean Quinoa Salad",
+    "description": "This White Bean Quinoa Salad recipe is a nutritious and delicious mix of canned cannellini beans, garbanzo beans, quinoa, cucumber, tomatoes, onion, celery, kalamata olives, Parmesan cheese shavings and fresh herbs all tossed in a lemony salad dressing.",
+    "servings": 6,
+    "prep_min": 20,
+    "cook_min": 0,
+    "tags": [
+      "white bean",
+      "quinoa",
+      "salad",
+      "vegetarian",
+      "healthy",
+      "make ahead"
+    ],
+    "ingredients": [
+      {
+        "amount": "1",
+        "unit": "can",
+        "name": "white beans"
+      },
+      {
+        "amount": "1",
+        "unit": "can",
+        "name": "cannellini beans"
+      },
+      {
+        "amount": 4,
+        "unit": "cup",
+        "name": "curly kale, chopped"
+      },
+      {
+        "amount": 1.5,
+        "unit": "cup",
+        "name": "cooked quinoa"
+      },
+      {
+        "amount": 1,
+        "unit": "cup",
+        "name": "cherry tomatoes, sliced in half"
+      },
+      {
+        "amount": 1,
+        "unit": "cup",
+        "name": "Persian cucumber sliced"
+      },
+      {
+        "amount": 1,
+        "unit": "empty",
+        "name": "celery stalk, finely chopped"
+      },
+      {
+        "amount": 0.25,
+        "unit": "cup",
+        "name": "red onion, sliced"
+      },
+      {
+        "amount": "3-4",
+        "unit": "empty",
+        "name": "green onions, sliced"
+      },
+      {
+        "amount": 0.25,
+        "unit": "cup",
+        "name": "fresh basil, finely cut into ribbons"
+      },
+      {
+        "amount": 0.5,
+        "unit": "cup",
+        "name": "lemon juice"
+      },
+      {
+        "amount": 0.5,
+        "unit": "cup",
+        "name": "olive oil"
+      },
+      {
+        "amount": "1",
+        "unit": "cup",
+        "name": "Parmesan cheese, finely grated"
+      },
+      {
+        "amount": 6,
+        "unit": "tbsp",
+        "name": "mayonnaise"
+      },
+      {
+        "amount": 2,
+        "unit": "empty",
+        "name": "garlic cloves, finely grated"
+      }
+    ],
+    "steps": [
+      "For The Lemon Dressing: Using a wire whisk, whisk the ingredients together in a medium size bowl. You can also toss everything in a blender and blend for 30 seconds until its nice a creamy.",
+      "Pour dressing into an airtight container or a mason jar, seal the lid tightly and store in the refrigerator for up to an hour before serving giving the flavors time to blend together before serving.",
+      "For The Salad: Drain and rinse the beans and add them to a large bowl.",
+      "Slice the kale leaves away from the ribs. Discard the ribs. Thinly slice or chop the leaves and add to the salad bowl. Chop celery, cucumber, onions, tomato, and herbs and add to the bowl. Shave cheese and set aside until you’re ready to toss the salad.",
+      "Drizzle about 1/2 cup of the dressing over the ingredients and toss well just so the ingredients are lightly coated. Add more if needed. Season with freshly cracked pepper.",
+      "Toss in the Parmesan cheese shavings and lightly toss again.",
+      "Chill the salad for 15-20 minutes before serving.",
+      "Store leftovers in an airtight container in the refrigerator for 3-4 days."
+    ],
+    "source": "https://www.theharvestkitchen.com/white-bean-quinoa-salad/",
+    "image": "https://www.theharvestkitchen.com/wp-content/uploads/2024/07/white-bean-quinoa-salad-728x1092.jpg",
+    "id": "17803498752130.07921437460295466",
+    "created_at": "2026-06-01T21:37:55.213Z"
   }
 ]

@@ -49,7 +49,14 @@ const RECIPE_SCHEMA = {
   prep_min: 'number',
   cook_min: 'number',
   tags: 'array of strings',
-  ingredients: [
+  ingredients_normal: [
+    {
+      amount: 'number or string',
+      unit: 'string (g, ml, tsp, tbsp, cup, oz, lb, or empty)',
+      name: 'string',
+    },
+  ],
+  ingredients_bulk: [
     {
       amount: 'number or string',
       unit: 'string (g, ml, tsp, tbsp, cup, oz, lb, or empty)',
@@ -348,24 +355,36 @@ function normalizeRecipe(recipe, logger, allowedTags = []) {
   recipe.tags = filterRecipeTags(recipe.tags || [], allowedTags)
   logger?.log(`Normalized tags to allowed list: ${recipe.tags.join(', ') || '(none)'}`)
 
-  if (!Array.isArray(recipe.ingredients)) return recipe
+  if (!Array.isArray(recipe.ingredients_normal) && !Array.isArray(recipe.ingredients_bulk) && Array.isArray(recipe.ingredients)) {
+    recipe.ingredients_normal = recipe.ingredients
+    recipe.ingredients_bulk = []
+  }
+
+  const normalIngredients = Array.isArray(recipe.ingredients_normal) ? recipe.ingredients_normal : []
+  const bulkIngredients = Array.isArray(recipe.ingredients_bulk) ? recipe.ingredients_bulk : []
 
   const knownUnits = new Set(['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', ''])
-  recipe.ingredients = recipe.ingredients.map((ing, i) => {
-    if (!ing || typeof ing !== 'object') return ing
+  function normalizeIngredientList(items, groupLabel) {
+    return items.map((ing, i) => {
+      if (!ing || typeof ing !== 'object') return ing
 
-    const next = { ...ing }
-    next.unit = typeof next.unit === 'string' ? next.unit.trim() : ''
+      const next = { ...ing }
+      next.unit = typeof next.unit === 'string' ? next.unit.trim() : ''
 
-    // If model put ingredient name into unit (e.g. unit: 'scallions'), recover it.
-    if ((!next.name || String(next.name).trim() === '') && next.unit && !knownUnits.has(next.unit.toLowerCase())) {
-      next.name = next.unit
-      next.unit = ''
-      logger?.log(`Normalized ingredient ${i}: moved unknown unit to name`)
-    }
+      // If model put ingredient name into unit (e.g. unit: 'scallions'), recover it.
+      if ((!next.name || String(next.name).trim() === '') && next.unit && !knownUnits.has(next.unit.toLowerCase())) {
+        next.name = next.unit
+        next.unit = ''
+        logger?.log(`Normalized ${groupLabel} ingredient ${i}: moved unknown unit to name`)
+      }
 
-    return next
-  })
+      return next
+    })
+  }
+
+  recipe.ingredients_normal = normalizeIngredientList(normalIngredients, 'normal')
+  recipe.ingredients_bulk = normalizeIngredientList(bulkIngredients, 'bulk')
+  delete recipe.ingredients
 
   return recipe
 }
@@ -480,6 +499,7 @@ Rules:
 - All fields are required except 'image' and 'description'
 - Tags must come only from this allowed list: ${allowedTagList.join(', ') || '(none)'}
 - Include only relevant tags from that allowed list. If none are relevant, return an empty tags array.
+- Every ingredient must be included in exactly one of: ingredients_normal or ingredients_bulk.
 - Amounts can be decimal numbers
 - Units must be one of: g, kg, ml, l, tsp, tbsp, cup, oz, lb, or empty string
 - Times should be in minutes (integers)
@@ -580,7 +600,8 @@ ${imageHint ? `- Preferred image URL for this page is: ${imageHint}` : ''}
 
     logger?.log(`✅ Recipe extraction complete:`, {
       title: recipe.title,
-      ingredients: recipe.ingredients?.length,
+      ingredients_normal: recipe.ingredients_normal?.length,
+      ingredients_bulk: recipe.ingredients_bulk?.length,
       steps: recipe.steps?.length,
       image: !!recipe.image,
     })
@@ -690,7 +711,9 @@ export function validateRecipe(recipe, logger) {
       throw new Error('Missing or invalid title')
     }
 
-    if (!Array.isArray(recipe.ingredients) || recipe.ingredients.length === 0) {
+    const hasNormal = Array.isArray(recipe.ingredients_normal) && recipe.ingredients_normal.length > 0
+    const hasBulk = Array.isArray(recipe.ingredients_bulk) && recipe.ingredients_bulk.length > 0
+    if (!hasNormal && !hasBulk) {
       logger?.log(`❌ Validation failed: Missing or invalid ingredients`)
       throw new Error('Missing or invalid ingredients')
     }
@@ -706,18 +729,30 @@ export function validateRecipe(recipe, logger) {
     }
 
     // Validate ingredients
-    recipe.ingredients.forEach((ing, i) => {
-      if (!ing?.name || typeof ing.name !== 'string') {
-        logger?.log(`❌ Validation failed: Ingredient ${i} missing name`)
-        throw new Error(`Ingredient ${i}: missing or invalid name`)
+    const ingredientGroups = [
+      { key: 'ingredients_normal', items: recipe.ingredients_normal || [] },
+      { key: 'ingredients_bulk', items: recipe.ingredients_bulk || [] },
+    ]
+
+    ingredientGroups.forEach(group => {
+      if (!Array.isArray(group.items)) {
+        logger?.log(`❌ Validation failed: ${group.key} must be an array`)
+        throw new Error(`${group.key} must be an array`)
       }
-      if (ing.amount !== undefined && ing.amount !== null) {
-        const amountType = typeof ing.amount
-        if (amountType !== 'string' && amountType !== 'number') {
-          logger?.log(`❌ Validation failed: Ingredient ${i} amount must be string or number`)
-          throw new Error(`Ingredient ${i}: amount must be string or number`)
+
+      group.items.forEach((ing, i) => {
+        if (!ing?.name || typeof ing.name !== 'string') {
+          logger?.log(`❌ Validation failed: ${group.key}[${i}] missing name`)
+          throw new Error(`${group.key}[${i}]: missing or invalid name`)
         }
-      }
+        if (ing.amount !== undefined && ing.amount !== null) {
+          const amountType = typeof ing.amount
+          if (amountType !== 'string' && amountType !== 'number') {
+            logger?.log(`❌ Validation failed: ${group.key}[${i}] amount must be string or number`)
+            throw new Error(`${group.key}[${i}]: amount must be string or number`)
+          }
+        }
+      })
     })
 
     logger?.log(`✅ All validations passed`)

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchHTML, extractRecipeFromHTML, validateRecipe, Logger } from '../lib/gemini'
 import { fetchTags, getTags, updateRecipes } from '../lib/github'
-import { filterRecipeTags, sanitizeTagList } from '../lib/planner'
+import { filterRecipeTags, getRecipeIngredientGroups, sanitizeTagList } from '../lib/planner'
 
 function blankIngredient() {
   return { amount: '', unit: '', name: '' }
@@ -105,16 +105,22 @@ export default function ImportModal({ onClose, onSuccess }) {
   }, [])
 
   function cloneRecipe(recipe) {
+    const ingredientGroups = getRecipeIngredientGroups(recipe)
     return {
       ...recipe,
       tags: filterRecipeTags(recipe.tags || [], availableTags),
-      ingredients: Array.isArray(recipe.ingredients)
-        ? recipe.ingredients.map(ing => ({
+      ingredients_normal: ingredientGroups.normal.length > 0
+        ? ingredientGroups.normal.map(ing => ({
             amount: ing?.amount ?? '',
             unit: ing?.unit ?? '',
             name: ing?.name ?? '',
           }))
         : [blankIngredient()],
+      ingredients_bulk: ingredientGroups.bulk.map(ing => ({
+        amount: ing?.amount ?? '',
+        unit: ing?.unit ?? '',
+        name: ing?.name ?? '',
+      })),
       steps: Array.isArray(recipe.steps) ? [...recipe.steps] : [''],
       description: recipe.description || '',
     }
@@ -139,11 +145,11 @@ export default function ImportModal({ onClose, onSuccess }) {
     )
   }
 
-  function updateIngredient(i, key, value) {
+  function updateIngredient(section, i, key, value) {
     updateCurrentRecipe(recipe => {
-      const ingredients = [...(recipe.ingredients || [])]
+      const ingredients = [...(recipe[section] || [])]
       ingredients[i] = { ...ingredients[i], [key]: value }
-      return { ...recipe, ingredients }
+      return { ...recipe, [section]: ingredients }
     })
   }
 
@@ -235,8 +241,17 @@ export default function ImportModal({ onClose, onSuccess }) {
       tags: Array.isArray(recipe.tags)
         ? filterRecipeTags(recipe.tags, availableTags)
         : [],
-      ingredients: Array.isArray(recipe.ingredients)
-        ? recipe.ingredients
+      ingredients_normal: Array.isArray(recipe.ingredients_normal)
+        ? recipe.ingredients_normal
+            .map(ing => ({
+              amount: ing?.amount ?? '',
+              unit: String(ing?.unit ?? '').trim(),
+              name: String(ing?.name ?? '').trim(),
+            }))
+            .filter(ing => ing.name)
+        : [],
+      ingredients_bulk: Array.isArray(recipe.ingredients_bulk)
+        ? recipe.ingredients_bulk
             .map(ing => ({
               amount: ing?.amount ?? '',
               unit: String(ing?.unit ?? '').trim(),
@@ -423,55 +438,108 @@ export default function ImportModal({ onClose, onSuccess }) {
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-medium text-gray-600">Ingredients</label>
-                      <button
-                        onClick={() =>
-                          updateCurrentRecipe(recipe => ({
-                            ...recipe,
-                            ingredients: [...(recipe.ingredients || []), blankIngredient()],
-                          }))
-                        }
-                        className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-100"
-                      >
-                        + Add Ingredient
-                      </button>
-                    </div>
-
-                    {(currentRecipe.ingredients || []).map((ing, i) => (
-                      <div key={i} className="grid grid-cols-[1fr_1fr_3fr_auto] gap-2">
-                        <input
-                          placeholder="Amount"
-                          value={ing.amount ?? ''}
-                          onChange={e => updateIngredient(i, 'amount', e.target.value)}
-                          className="border border-gray-200 rounded px-2 py-1.5 text-sm"
-                        />
-                        <input
-                          placeholder="Unit"
-                          value={ing.unit || ''}
-                          onChange={e => updateIngredient(i, 'unit', e.target.value)}
-                          className="border border-gray-200 rounded px-2 py-1.5 text-sm"
-                        />
-                        <input
-                          placeholder="Ingredient name"
-                          value={ing.name || ''}
-                          onChange={e => updateIngredient(i, 'name', e.target.value)}
-                          className="border border-gray-200 rounded px-2 py-1.5 text-sm"
-                        />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-medium text-gray-600">Ingredients (Normal)</label>
                         <button
                           onClick={() =>
                             updateCurrentRecipe(recipe => ({
                               ...recipe,
-                              ingredients: (recipe.ingredients || []).filter((_, idx) => idx !== i),
+                              ingredients_normal: [...(recipe.ingredients_normal || []), blankIngredient()],
                             }))
                           }
-                          className="px-2 rounded border border-red-200 text-red-700 text-xs hover:bg-red-50"
+                          className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-100"
                         >
-                          ✕
+                          + Add Normal
                         </button>
                       </div>
-                    ))}
+
+                      {(currentRecipe.ingredients_normal || []).map((ing, i) => (
+                        <div key={`normal-${i}`} className="grid grid-cols-[1fr_1fr_3fr_auto] gap-2">
+                          <input
+                            placeholder="Amount"
+                            value={ing.amount ?? ''}
+                            onChange={e => updateIngredient('ingredients_normal', i, 'amount', e.target.value)}
+                            className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                          />
+                          <input
+                            placeholder="Unit"
+                            value={ing.unit || ''}
+                            onChange={e => updateIngredient('ingredients_normal', i, 'unit', e.target.value)}
+                            className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                          />
+                          <input
+                            placeholder="Ingredient name"
+                            value={ing.name || ''}
+                            onChange={e => updateIngredient('ingredients_normal', i, 'name', e.target.value)}
+                            className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                          />
+                          <button
+                            onClick={() =>
+                              updateCurrentRecipe(recipe => ({
+                                ...recipe,
+                                ingredients_normal: (recipe.ingredients_normal || []).filter((_, idx) => idx !== i),
+                              }))
+                            }
+                            className="px-2 rounded border border-red-200 text-red-700 text-xs hover:bg-red-50"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-medium text-gray-600">Ingredients (Bulk / Pantry)</label>
+                        <button
+                          onClick={() =>
+                            updateCurrentRecipe(recipe => ({
+                              ...recipe,
+                              ingredients_bulk: [...(recipe.ingredients_bulk || []), blankIngredient()],
+                            }))
+                          }
+                          className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-100"
+                        >
+                          + Add Bulk
+                        </button>
+                      </div>
+
+                      {(currentRecipe.ingredients_bulk || []).map((ing, i) => (
+                        <div key={`bulk-${i}`} className="grid grid-cols-[1fr_1fr_3fr_auto] gap-2">
+                          <input
+                            placeholder="Amount"
+                            value={ing.amount ?? ''}
+                            onChange={e => updateIngredient('ingredients_bulk', i, 'amount', e.target.value)}
+                            className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                          />
+                          <input
+                            placeholder="Unit"
+                            value={ing.unit || ''}
+                            onChange={e => updateIngredient('ingredients_bulk', i, 'unit', e.target.value)}
+                            className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                          />
+                          <input
+                            placeholder="Ingredient name"
+                            value={ing.name || ''}
+                            onChange={e => updateIngredient('ingredients_bulk', i, 'name', e.target.value)}
+                            className="border border-gray-200 rounded px-2 py-1.5 text-sm"
+                          />
+                          <button
+                            onClick={() =>
+                              updateCurrentRecipe(recipe => ({
+                                ...recipe,
+                                ingredients_bulk: (recipe.ingredients_bulk || []).filter((_, idx) => idx !== i),
+                              }))
+                            }
+                            className="px-2 rounded border border-red-200 text-red-700 text-xs hover:bg-red-50"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="space-y-2">

@@ -7,21 +7,20 @@
     "prep_min": 20,
     "cook_min": 80,
     "tags": [],
-    "ingredients": [
+    "steps": [
+      "Slice and salt the aubergines, then let them drain and dry.",
+      "Coat in flour, egg and breadcrumb mixture, then bake until golden.",
+      "Make a quick tomato sauce with garlic, tomatoes, vinegar and basil.",
+      "Layer aubergine, sauce, mozzarella and Parmesan, then bake until browned."
+    ],
+    "image": "https://cooksimply.co.uk/wp-content/uploads/2023/03/aubergine-parmigiana-cook-simply.jpg",
+    "source": "https://cooksimply.co.uk/aubergine-parmigiana-recipe/",
+    "created_at": "2026-06-01T11:09:33.769Z",
+    "ingredients_normal": [
       {
         "amount": 2,
         "unit": "",
         "name": "aubergines"
-      },
-      {
-        "amount": 1,
-        "unit": "tbsp",
-        "name": "olive oil"
-      },
-      {
-        "amount": 100,
-        "unit": "g",
-        "name": "plain flour"
       },
       {
         "amount": 3,
@@ -37,6 +36,38 @@
         "amount": 150,
         "unit": "g",
         "name": "Parmesan, finely grated"
+      },
+      {
+        "amount": 3,
+        "unit": "cloves",
+        "name": "garlic"
+      },
+      {
+        "amount": 2,
+        "unit": "cans",
+        "name": "chopped tomatoes"
+      },
+      {
+        "amount": 1,
+        "unit": "handful",
+        "name": "fresh basil"
+      },
+      {
+        "amount": 2,
+        "unit": "to 3 balls",
+        "name": "mozzarella, sliced"
+      }
+    ],
+    "ingredients_bulk": [
+      {
+        "amount": 1,
+        "unit": "tbsp",
+        "name": "olive oil"
+      },
+      {
+        "amount": 100,
+        "unit": "g",
+        "name": "plain flour"
       },
       {
         "amount": 2,
@@ -59,40 +90,11 @@
         "name": "black pepper"
       },
       {
-        "amount": 3,
-        "unit": "cloves",
-        "name": "garlic"
-      },
-      {
         "amount": 2,
         "unit": "tsp",
         "name": "white wine vinegar"
-      },
-      {
-        "amount": 2,
-        "unit": "cans",
-        "name": "chopped tomatoes"
-      },
-      {
-        "amount": 1,
-        "unit": "handful",
-        "name": "fresh basil"
-      },
-      {
-        "amount": 2,
-        "unit": "to 3 balls",
-        "name": "mozzarella, sliced"
       }
-    ],
-    "steps": [
-      "Slice and salt the aubergines, then let them drain and dry.",
-      "Coat in flour, egg and breadcrumb mixture, then bake until golden.",
-      "Make a quick tomato sauce with garlic, tomatoes, vinegar and basil.",
-      "Layer aubergine, sauce, mozzarella and Parmesan, then bake until browned."
-    ],
-    "image": "https://cooksimply.co.uk/wp-content/uploads/2023/03/aubergine-parmigiana-cook-simply.jpg",
-    "source": "https://cooksimply.co.uk/aubergine-parmigiana-recipe/",
-    "created_at": "2026-06-01T11:09:33.769Z"
+    ]
   },
   {
     "id": "1780312259355",
@@ -102,7 +104,16 @@
     "prep_min": 30,
     "cook_min": 0,
     "tags": [],
-    "ingredients": [
+    "steps": [
+      "Soak the noodles and prep the vegetables, tofu and sauce.",
+      "Stir-fry shallot, garlic and tofu with the eggs, then remove from the pan.",
+      "Fry the carrot and mushrooms, add noodles and sauce, then toss everything together.",
+      "Finish with bean sprouts, spring onions, coriander, peanuts and lime."
+    ],
+    "image": "https://www.einfachkochen.de/sites/einfachkochen.de/files/styles/1946_1460/public/2021-07/pad-thai-vegetarisch-quer-5219.jpg?h=92704f59&itok=_DAnID6z",
+    "source": "https://www.einfachkochen.de/rezepte/vegetarisches-pad-thai-unglaublich-lecker",
+    "created_at": "2026-06-01T11:10:59.355Z",
+    "ingredients_normal": [
       {
         "amount": 100,
         "unit": "g",
@@ -154,6 +165,18 @@
         "name": "firm tofu"
       },
       {
+        "amount": 2,
+        "unit": "",
+        "name": "eggs"
+      },
+      {
+        "amount": 2,
+        "unit": "tbsp",
+        "name": "peanuts, chopped"
+      }
+    ],
+    "ingredients_bulk": [
+      {
         "amount": 1,
         "unit": "tbsp",
         "name": "tamarind paste"
@@ -172,27 +195,8 @@
         "amount": 2,
         "unit": "tbsp",
         "name": "rapeseed oil"
-      },
-      {
-        "amount": 2,
-        "unit": "",
-        "name": "eggs"
-      },
-      {
-        "amount": 2,
-        "unit": "tbsp",
-        "name": "peanuts, chopped"
       }
-    ],
-    "steps": [
-      "Soak the noodles and prep the vegetables, tofu and sauce.",
-      "Stir-fry shallot, garlic and tofu with the eggs, then remove from the pan.",
-      "Fry the carrot and mushrooms, add noodles and sauce, then toss everything together.",
-      "Finish with bean sprouts, spring onions, coriander, peanuts and lime."
-    ],
-    "image": "https://www.einfachkochen.de/sites/einfachkochen.de/files/styles/1946_1460/public/2021-07/pad-thai-vegetarisch-quer-5219.jpg?h=92704f59&itok=_DAnID6z",
-    "source": "https://www.einfachkochen.de/rezepte/vegetarisches-pad-thai-unglaublich-lecker",
-    "created_at": "2026-06-01T11:10:59.355Z"
+    ]
   },
   {
     "title": "Asian Cucumber Salad",
@@ -204,12 +208,30 @@
       "asian",
       "salad"
     ],
-    "ingredients": [
+    "steps": [
+      "Score the cucumber with the tines of a fork before slicing.",
+      "Combine the strained cucumbers (if salted), seasoned rice vinegar, toasted sesame oil, soy sauce, and sweetener in a salad bowl.",
+      "Grate fresh garlic into the salad bowl.",
+      "Mix all ingredients thoroughly and adjust salt and spice level to your liking.",
+      "Garnish with toasted sesame seeds before serving."
+    ],
+    "source": "https://www.feastingathome.com/asian-cucumber-salad/",
+    "image": "https://www.feastingathome.com/wp-content/uploads/2021/06/Asian-Cucumber-Salad-22.jpg",
+    "id": "17803247714690.827159833687274",
+    "created_at": "2026-06-01T14:39:31.469Z",
+    "ingredients_normal": [
       {
         "amount": "",
         "unit": "",
         "name": "Thin-skinned cucumbers (English, Turkish, or Persian)"
       },
+      {
+        "amount": "",
+        "unit": "",
+        "name": "Fresh garlic clove"
+      }
+    ],
+    "ingredients_bulk": [
       {
         "amount": "",
         "unit": "",
@@ -233,25 +255,9 @@
       {
         "amount": "",
         "unit": "",
-        "name": "Fresh garlic clove"
-      },
-      {
-        "amount": "",
-        "unit": "",
         "name": "Toasted sesame seeds"
       }
-    ],
-    "steps": [
-      "Score the cucumber with the tines of a fork before slicing.",
-      "Combine the strained cucumbers (if salted), seasoned rice vinegar, toasted sesame oil, soy sauce, and sweetener in a salad bowl.",
-      "Grate fresh garlic into the salad bowl.",
-      "Mix all ingredients thoroughly and adjust salt and spice level to your liking.",
-      "Garnish with toasted sesame seeds before serving."
-    ],
-    "source": "https://www.feastingathome.com/asian-cucumber-salad/",
-    "image": "https://www.feastingathome.com/wp-content/uploads/2021/06/Asian-Cucumber-Salad-22.jpg",
-    "id": "17803247714690.827159833687274",
-    "created_at": "2026-06-01T14:39:31.469Z"
+    ]
   },
   {
     "title": "Creamy Pasta Gorgonzola Recipe With Mushrooms",
@@ -263,7 +269,20 @@
       "pasta",
       "quick"
     ],
-    "ingredients": [
+    "steps": [
+      "Make the gorgonzola sauce by combining heavy cream, milk, and 100g gorgonzola cheese.",
+      "Cook the pasta al dente in a large pot of salted water, reserving some pasta water before draining. Drain the pasta and toss with olive oil to prevent sticking.",
+      "In a large skillet, bake the mushrooms on medium heat in olive oil and butter until golden brown. Optionally, add a little white wine to the pan.",
+      "Add the gorgonzola sauce to the skillet with the mushrooms and mix well.",
+      "Add the cooked pasta to the pan and toss everything together.",
+      "Add a splash of the reserved pasta water to achieve a creamy gorgonzola pasta sauce.",
+      "Serve the pasta gorgonzola topped with chopped walnuts, fresh parsley, and black pepper."
+    ],
+    "source": "https://insimoneskitchen.com/pasta-gorgonzola-recipe/",
+    "image": "https://insimoneskitchen.com/wp-content/uploads/2024/02/Pasta-gorgonzola-14.jpg",
+    "id": "17803291910910.101767936514362",
+    "created_at": "2026-06-01T15:53:11.091Z",
+    "ingredients_normal": [
       {
         "amount": null,
         "unit": "",
@@ -295,19 +314,9 @@
         "name": "milk"
       },
       {
-        "amount": null,
-        "unit": "",
-        "name": "olive oil"
-      },
-      {
         "amount": "a good bit",
         "unit": "",
         "name": "butter"
-      },
-      {
-        "amount": null,
-        "unit": "",
-        "name": "salt"
       },
       {
         "amount": null,
@@ -322,27 +331,26 @@
       {
         "amount": null,
         "unit": "",
-        "name": "black pepper"
+        "name": "white wine (optional)"
+      }
+    ],
+    "ingredients_bulk": [
+      {
+        "amount": null,
+        "unit": "",
+        "name": "olive oil"
       },
       {
         "amount": null,
         "unit": "",
-        "name": "white wine (optional)"
+        "name": "salt"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "black pepper"
       }
-    ],
-    "steps": [
-      "Make the gorgonzola sauce by combining heavy cream, milk, and 100g gorgonzola cheese.",
-      "Cook the pasta al dente in a large pot of salted water, reserving some pasta water before draining. Drain the pasta and toss with olive oil to prevent sticking.",
-      "In a large skillet, bake the mushrooms on medium heat in olive oil and butter until golden brown. Optionally, add a little white wine to the pan.",
-      "Add the gorgonzola sauce to the skillet with the mushrooms and mix well.",
-      "Add the cooked pasta to the pan and toss everything together.",
-      "Add a splash of the reserved pasta water to achieve a creamy gorgonzola pasta sauce.",
-      "Serve the pasta gorgonzola topped with chopped walnuts, fresh parsley, and black pepper."
-    ],
-    "source": "https://insimoneskitchen.com/pasta-gorgonzola-recipe/",
-    "image": "https://insimoneskitchen.com/wp-content/uploads/2024/02/Pasta-gorgonzola-14.jpg",
-    "id": "17803291910910.101767936514362",
-    "created_at": "2026-06-01T15:53:11.091Z"
+    ]
   },
   {
     "title": "Veggie burritos",
@@ -351,7 +359,16 @@
     "prep_min": 15,
     "cook_min": 20,
     "tags": [],
-    "ingredients": [
+    "steps": [
+      "To make the salsa, combine the red onions, tomatoes, vinegar, half the parsley and half the oil, then season to taste. Toss the avocado slices with a splash of the lime juice, and set aside.",
+      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e and spices, and cook for 3-5 mins until the purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
+      "Warm the tortillas following pack instructions and reheat the rice until piping hot. Assemble the burritos by topping the tortillas with the lettuce, vegetable filling and rice. Dot over the avocado slices and soured cream, then fold in one side of the tortillas and roll up. Serve warm, with the salsa on the side."
+    ],
+    "source": "https://www.bbcgoodfood.com/recipes/veggie-burrito",
+    "id": "17803304408110.6225938223696568",
+    "created_at": "2026-06-01T16:14:00.811Z",
+    "image": "https://images.immediate.co.uk/production/volatile/sites/30/2023/12/211220231703163234.jpeg?quality=90&webp=true",
+    "ingredients_normal": [
       {
         "amount": 1,
         "unit": "",
@@ -363,19 +380,9 @@
         "name": "tomatoes, cut into 1cm cubes"
       },
       {
-        "amount": 2,
-        "unit": "tbsp",
-        "name": "balsamic vinegar"
-      },
-      {
         "amount": 20,
         "unit": "g",
         "name": "parsley, finely chopped"
-      },
-      {
-        "amount": 2,
-        "unit": "tbsp",
-        "name": "olive oil"
       },
       {
         "amount": 2,
@@ -408,21 +415,6 @@
         "name": "tomato purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e"
       },
       {
-        "amount": 0.5,
-        "unit": "tsp",
-        "name": "chilli powder"
-      },
-      {
-        "amount": 0.5,
-        "unit": "tsp",
-        "name": "ground cumin"
-      },
-      {
-        "amount": 1,
-        "unit": "tsp",
-        "name": "paprika"
-      },
-      {
         "amount": 400,
         "unit": "g",
         "name": "kidney beans, canned, drained and rinsed"
@@ -431,11 +423,6 @@
         "amount": 195,
         "unit": "g",
         "name": "sweetcorn, canned, drained"
-      },
-      {
-        "amount": "pinch",
-        "unit": "",
-        "name": "cayenne pepper"
       },
       {
         "amount": 8,
@@ -458,15 +445,38 @@
         "name": "soured cream"
       }
     ],
-    "steps": [
-      "To make the salsa, combine the red onions, tomatoes, vinegar, half the parsley and half the oil, then season to taste. Toss the avocado slices with a splash of the lime juice, and set aside.",
-      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e and spices, and cook for 3-5 mins until the purï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½e turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
-      "Warm the tortillas following pack instructions and reheat the rice until piping hot. Assemble the burritos by topping the tortillas with the lettuce, vegetable filling and rice. Dot over the avocado slices and soured cream, then fold in one side of the tortillas and roll up. Serve warm, with the salsa on the side."
-    ],
-    "source": "https://www.bbcgoodfood.com/recipes/veggie-burrito",
-    "id": "17803304408110.6225938223696568",
-    "created_at": "2026-06-01T16:14:00.811Z",
-    "image": "https://images.immediate.co.uk/production/volatile/sites/30/2023/12/211220231703163234.jpeg?quality=90&webp=true"
+    "ingredients_bulk": [
+      {
+        "amount": 2,
+        "unit": "tbsp",
+        "name": "balsamic vinegar"
+      },
+      {
+        "amount": 2,
+        "unit": "tbsp",
+        "name": "olive oil"
+      },
+      {
+        "amount": 0.5,
+        "unit": "tsp",
+        "name": "chilli powder"
+      },
+      {
+        "amount": 0.5,
+        "unit": "tsp",
+        "name": "ground cumin"
+      },
+      {
+        "amount": 1,
+        "unit": "tsp",
+        "name": "paprika"
+      },
+      {
+        "amount": "pinch",
+        "unit": "",
+        "name": "cayenne pepper"
+      }
+    ]
   },
   {
     "title": "Creamy courgette lasagne",
@@ -475,16 +485,20 @@
     "prep_min": 20,
     "cook_min": 30,
     "tags": [],
-    "ingredients": [
+    "steps": [
+      "Heat oven to 220C/fan 200C/gas 7. Put a pan of water on to boil, then cook the lasagne sheets for about 5 mins until softened, but not cooked through. Rinse in cold water, then drizzle with a little oil to stop them sticking together.",
+      "Meanwhile, heat the oil in a large frying pan, then fry the onion. After 3 mins, add the courgettes and garlic and continue to fry until the courgette has softened and turned bright green. Stir in 2/3 of both the ricotta and the cheddar, then season to taste. Heat the tomato sauce in the microwave for 2 mins on High until hot.",
+      "In a large baking dish, layer up the lasagne, starting with half the courgette mix, then pasta, then tomato sauce. Repeat, top with blobs of the remaining ricotta, then scatter with the rest of the cheddar. Bake on the top shelf for about 10 mins until the pasta is tender and the cheese is golden."
+    ],
+    "source": "https://www.bbcgoodfood.com/recipes/creamy-courgette-lasagne",
+    "image": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/spinach-courgette-lasagne-dd15c74.jpg",
+    "id": "17803310167240.25067100851743174",
+    "created_at": "2026-06-01T16:23:36.724Z",
+    "ingredients_normal": [
       {
         "amount": 9,
         "unit": "",
         "name": "dried lasagne sheets"
-      },
-      {
-        "amount": 1,
-        "unit": "tbsp",
-        "name": "sunflower oil"
       },
       {
         "amount": 1,
@@ -517,15 +531,13 @@
         "name": "jar tomato sauce for pasta"
       }
     ],
-    "steps": [
-      "Heat oven to 220C/fan 200C/gas 7. Put a pan of water on to boil, then cook the lasagne sheets for about 5 mins until softened, but not cooked through. Rinse in cold water, then drizzle with a little oil to stop them sticking together.",
-      "Meanwhile, heat the oil in a large frying pan, then fry the onion. After 3 mins, add the courgettes and garlic and continue to fry until the courgette has softened and turned bright green. Stir in 2/3 of both the ricotta and the cheddar, then season to taste. Heat the tomato sauce in the microwave for 2 mins on High until hot.",
-      "In a large baking dish, layer up the lasagne, starting with half the courgette mix, then pasta, then tomato sauce. Repeat, top with blobs of the remaining ricotta, then scatter with the rest of the cheddar. Bake on the top shelf for about 10 mins until the pasta is tender and the cheese is golden."
-    ],
-    "source": "https://www.bbcgoodfood.com/recipes/creamy-courgette-lasagne",
-    "image": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/spinach-courgette-lasagne-dd15c74.jpg",
-    "id": "17803310167240.25067100851743174",
-    "created_at": "2026-06-01T16:23:36.724Z"
+    "ingredients_bulk": [
+      {
+        "amount": 1,
+        "unit": "tbsp",
+        "name": "sunflower oil"
+      }
+    ]
   },
   {
     "title": "Korean bibimbap",
@@ -536,7 +548,18 @@
     "tags": [
       "quick"
     ],
-    "ingredients": [
+    "steps": [
+      "Mix the bibimbap sauce ingredients together in a small bowl with 1 tbsp water and set aside.",
+      "Put the sliced mushroom, courgette, carrot and beansprouts on a plate. Put a small heatproof bowl or ramekin upside down in the middle of a medium lidded pan. Add enough water to come halfway up the ramekin and bring to a boil. Carefully put the plate of vegetables on top of the ramekin and put a lid on the pan. Steam the vegetables for 3 mins until tender.",
+      "Meanwhile, put the spinach in a bowl and pour boiling water over the top. Stir to wilt the leaves, then drain and rinse under cold water. Squeeze any excess water from the spinach, then mix in a bowl with the sesame oil, a pinch of salt and sesame seeds. Set aside.",
+      "Heat the vegetable oil in a frying pan over a high heat. Crack in the egg and fry to your liking.",
+      "Fill a bowl with the rice. Top with the fried egg, then use tongs to add the steamed vegetables around it. Serve with the bibimbap sauce, a little extra sesame oil and sesame seeds. Mix everything together before eating."
+    ],
+    "source": "https://www.bbcgoodfood.com/recipes/korean-bibimbap",
+    "image": "https://images.immediate.co.uk/production/volatile/sites/30/2024/09/BibimbapKoreanMixedRice-6a656fe.jpg?quality=90&webp=true&resize=900,817",
+    "id": "17803310167240.22924099762024763",
+    "created_at": "2026-06-01T16:23:36.724Z",
+    "ingredients_normal": [
       {
         "amount": 1,
         "unit": "",
@@ -563,6 +586,18 @@
         "name": "spinach"
       },
       {
+        "amount": 1,
+        "unit": "",
+        "name": "egg"
+      },
+      {
+        "amount": 150,
+        "unit": "g",
+        "name": "cooked sushi rice"
+      }
+    ],
+    "ingredients_bulk": [
+      {
         "amount": 0.25,
         "unit": "tsp",
         "name": "sesame oil, plus extra to serve"
@@ -576,16 +611,6 @@
         "amount": 2,
         "unit": "tbsp",
         "name": "vegetable oil"
-      },
-      {
-        "amount": 1,
-        "unit": "",
-        "name": "egg"
-      },
-      {
-        "amount": 150,
-        "unit": "g",
-        "name": "cooked sushi rice"
       },
       {
         "amount": 2,
@@ -607,18 +632,7 @@
         "unit": "tsp",
         "name": "sesame oil (for sauce)"
       }
-    ],
-    "steps": [
-      "Mix the bibimbap sauce ingredients together in a small bowl with 1 tbsp water and set aside.",
-      "Put the sliced mushroom, courgette, carrot and beansprouts on a plate. Put a small heatproof bowl or ramekin upside down in the middle of a medium lidded pan. Add enough water to come halfway up the ramekin and bring to a boil. Carefully put the plate of vegetables on top of the ramekin and put a lid on the pan. Steam the vegetables for 3 mins until tender.",
-      "Meanwhile, put the spinach in a bowl and pour boiling water over the top. Stir to wilt the leaves, then drain and rinse under cold water. Squeeze any excess water from the spinach, then mix in a bowl with the sesame oil, a pinch of salt and sesame seeds. Set aside.",
-      "Heat the vegetable oil in a frying pan over a high heat. Crack in the egg and fry to your liking.",
-      "Fill a bowl with the rice. Top with the fried egg, then use tongs to add the steamed vegetables around it. Serve with the bibimbap sauce, a little extra sesame oil and sesame seeds. Mix everything together before eating."
-    ],
-    "source": "https://www.bbcgoodfood.com/recipes/korean-bibimbap",
-    "image": "https://images.immediate.co.uk/production/volatile/sites/30/2024/09/BibimbapKoreanMixedRice-6a656fe.jpg?quality=90&webp=true&resize=900,817",
-    "id": "17803310167240.22924099762024763",
-    "created_at": "2026-06-01T16:23:36.724Z"
+    ]
   },
   {
     "title": "White Bean Quinoa Salad",
@@ -630,7 +644,21 @@
       "salad",
       "healthy"
     ],
-    "ingredients": [
+    "steps": [
+      "For The Lemon Dressing: Using a wire whisk, whisk the ingredients together in a medium size bowl. You can also toss everything in a blender and blend for 30 seconds until its nice a creamy.",
+      "Pour dressing into an airtight container or a mason jar, seal the lid tightly and store in the refrigerator for up to an hour before serving giving the flavors time to blend together before serving.",
+      "For The Salad: Drain and rinse the beans and add them to a large bowl.",
+      "Slice the kale leaves away from the ribs. Discard the ribs. Thinly slice or chop the leaves and add to the salad bowl. Chop celery, cucumber, onions, tomato, and herbs and add to the bowl. Shave cheese and set aside until you’re ready to toss the salad.",
+      "Drizzle about 1/2 cup of the dressing over the ingredients and toss well just so the ingredients are lightly coated. Add more if needed. Season with freshly cracked pepper.",
+      "Toss in the Parmesan cheese shavings and lightly toss again.",
+      "Chill the salad for 15-20 minutes before serving.",
+      "Store leftovers in an airtight container in the refrigerator for 3-4 days."
+    ],
+    "source": "https://www.theharvestkitchen.com/white-bean-quinoa-salad/",
+    "image": "https://www.theharvestkitchen.com/wp-content/uploads/2024/07/white-bean-quinoa-salad-728x1092.jpg",
+    "id": "17803498752130.07921437460295466",
+    "created_at": "2026-06-01T21:37:55.213Z",
+    "ingredients_normal": [
       {
         "amount": "1",
         "unit": "can",
@@ -687,19 +715,9 @@
         "name": "lemon juice"
       },
       {
-        "amount": 0.5,
-        "unit": "cup",
-        "name": "olive oil"
-      },
-      {
         "amount": "1",
         "unit": "cup",
         "name": "Parmesan cheese, finely grated"
-      },
-      {
-        "amount": 6,
-        "unit": "tbsp",
-        "name": "mayonnaise"
       },
       {
         "amount": 2,
@@ -707,19 +725,17 @@
         "name": "garlic cloves, finely grated"
       }
     ],
-    "steps": [
-      "For The Lemon Dressing: Using a wire whisk, whisk the ingredients together in a medium size bowl. You can also toss everything in a blender and blend for 30 seconds until its nice a creamy.",
-      "Pour dressing into an airtight container or a mason jar, seal the lid tightly and store in the refrigerator for up to an hour before serving giving the flavors time to blend together before serving.",
-      "For The Salad: Drain and rinse the beans and add them to a large bowl.",
-      "Slice the kale leaves away from the ribs. Discard the ribs. Thinly slice or chop the leaves and add to the salad bowl. Chop celery, cucumber, onions, tomato, and herbs and add to the bowl. Shave cheese and set aside until you’re ready to toss the salad.",
-      "Drizzle about 1/2 cup of the dressing over the ingredients and toss well just so the ingredients are lightly coated. Add more if needed. Season with freshly cracked pepper.",
-      "Toss in the Parmesan cheese shavings and lightly toss again.",
-      "Chill the salad for 15-20 minutes before serving.",
-      "Store leftovers in an airtight container in the refrigerator for 3-4 days."
-    ],
-    "source": "https://www.theharvestkitchen.com/white-bean-quinoa-salad/",
-    "image": "https://www.theharvestkitchen.com/wp-content/uploads/2024/07/white-bean-quinoa-salad-728x1092.jpg",
-    "id": "17803498752130.07921437460295466",
-    "created_at": "2026-06-01T21:37:55.213Z"
+    "ingredients_bulk": [
+      {
+        "amount": 0.5,
+        "unit": "cup",
+        "name": "olive oil"
+      },
+      {
+        "amount": 6,
+        "unit": "tbsp",
+        "name": "mayonnaise"
+      }
+    ]
   }
 ]

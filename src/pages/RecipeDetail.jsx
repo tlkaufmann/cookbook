@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { fetchRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
+import { getRecipeIngredientGroups } from '../lib/planner'
 
 function formatAmount(amount, scale) {
   const n = parseFloat(amount)
@@ -29,6 +30,7 @@ export default function RecipeDetail() {
   if (!recipe) return <p className="text-gray-500 text-sm mt-12 text-center">Recipe not found.</p>
 
   const scale = servings / recipe.servings
+  const ingredientGroups = getRecipeIngredientGroups(recipe)
 
   return (
     <div className="space-y-8">
@@ -110,35 +112,65 @@ export default function RecipeDetail() {
 
       {/* Ingredients & Steps */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <h2 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">
+        <div className="rounded-2xl border border-[#143109]/15 bg-white/80 p-4">
+          <h2 className="font-semibold text-[#143109] mb-3 text-sm uppercase tracking-wide">
             Ingredients
           </h2>
-          <ul className="space-y-2">
-            {recipe.ingredients?.map((ing, i) => {
-              const amt = formatAmount(ing.amount, scale)
-              return (
-                <li key={i} className="flex gap-2 text-sm text-gray-700">
-                  <span className="font-medium text-gray-900 shrink-0 tabular-nums">
-                    {amt != null
-                      ? `${amt}${ing.unit ? ` ${ing.unit}` : ''}`
-                      : '—'}
-                  </span>
-                  <span>{ing.name}</span>
-                </li>
-              )
-            })}
-          </ul>
+          <div className="space-y-4">
+            <div className="pb-3 border-b border-[#143109]/10">
+              <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Normal</h3>
+              <ul className="space-y-2">
+                {ingredientGroups.normal.map((ing, i) => {
+                  const amt = formatAmount(ing.amount, scale)
+                  return (
+                    <li key={`normal-${i}`} className="flex gap-2 text-sm text-gray-700">
+                      <span className="font-medium text-gray-500 shrink-0 tabular-nums">
+                        {amt != null
+                          ? `${amt}${ing.unit ? ` ${ing.unit}` : ''}`
+                          : '—'}
+                      </span>
+                      <span className="text-gray-900">{ing.name}</span>
+                    </li>
+                  )
+                })}
+                {ingredientGroups.normal.length === 0 && (
+                  <li className="text-sm text-gray-400">No normal ingredients.</li>
+                )}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-2">Bulk / Pantry</h3>
+              <ul className="space-y-2">
+                {ingredientGroups.bulk.map((ing, i) => {
+                  const amt = formatAmount(ing.amount, scale)
+                  return (
+                    <li key={`bulk-${i}`} className="flex gap-2 text-sm text-gray-700">
+                      <span className="font-medium text-gray-500 shrink-0 tabular-nums">
+                        {amt != null
+                          ? `${amt}${ing.unit ? ` ${ing.unit}` : ''}`
+                          : '—'}
+                      </span>
+                      <span className="text-gray-900">{ing.name}</span>
+                    </li>
+                  )
+                })}
+                {ingredientGroups.bulk.length === 0 && (
+                  <li className="text-sm text-gray-400">No bulk/pantry ingredients.</li>
+                )}
+              </ul>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <h2 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">
+        <div className="rounded-2xl border border-[#143109]/15 bg-white/80 p-4">
+          <h2 className="font-semibold text-[#143109] mb-3 text-sm uppercase tracking-wide">
             Steps
           </h2>
           <ol className="space-y-4">
             {recipe.steps?.map((step, i) => (
-              <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="shrink-0 w-5 h-5 rounded-full bg-gray-900 text-white
+              <li key={i} className="flex gap-3 text-sm text-gray-700 pl-3">
+                <span className="shrink-0 w-5 h-5 rounded-full bg-[#143109] text-white
                                  flex items-center justify-center text-xs font-medium mt-0.5">
                   {i + 1}
                 </span>

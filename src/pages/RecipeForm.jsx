@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { fetchTags, getRecipes, getTags, updateRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
-import { filterRecipeTags, sanitizeTagList } from '../lib/planner'
+import { filterRecipeTags, getRecipeIngredientGroups, sanitizeTagList } from '../lib/planner'
 
 const UNITS = ['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', '']
 
@@ -11,7 +11,8 @@ function blankRecipe() {
   return {
     title: '', description: '', servings: 2,
     prep_min: 0, cook_min: 0, tags: [],
-    ingredients: [blankIngredient()],
+    ingredients_normal: [blankIngredient()],
+    ingredients_bulk: [],
     steps: [''], source: '', image: '',
   }
 }
@@ -45,9 +46,12 @@ export default function RecipeForm() {
           if (isEditing) {
             const recipe = recipes.find(r => r.id === id)
             if (recipe) {
+              const ingredientGroups = getRecipeIngredientGroups(recipe)
               setForm({
                 ...recipe,
                 tags: filterRecipeTags(recipe.tags || [], allowedTags),
+                ingredients_normal: ingredientGroups.normal.length > 0 ? ingredientGroups.normal : [blankIngredient()],
+                ingredients_bulk: ingredientGroups.bulk,
               })
             }
           }
@@ -86,15 +90,22 @@ export default function RecipeForm() {
   }
 
   // Ingredient helpers
-  function setIng(i, key, value) {
+  function setIng(section, i, key, value) {
     setForm(prev => {
-      const ingredients = [...prev.ingredients]
+      const ingredients = [...(prev[section] || [])]
       ingredients[i] = { ...ingredients[i], [key]: value }
-      return { ...prev, ingredients }
+      return { ...prev, [section]: ingredients }
     })
   }
-  function addIng() { setForm(prev => ({ ...prev, ingredients: [...prev.ingredients, blankIngredient()] })) }
-  function removeIng(i) { setForm(prev => ({ ...prev, ingredients: prev.ingredients.filter((_, idx) => idx !== i) })) }
+  function addIng(section) {
+    setForm(prev => ({ ...prev, [section]: [...(prev[section] || []), blankIngredient()] }))
+  }
+  function removeIng(section, i) {
+    setForm(prev => ({
+      ...prev,
+      [section]: (prev[section] || []).filter((_, idx) => idx !== i),
+    }))
+  }
 
   // Step helpers
   function setStep(i, value) {
@@ -127,14 +138,36 @@ export default function RecipeForm() {
     try {
       const allowedTagSet = new Set(allTags)
       const tags = sanitizeTagList(form.tags).filter(tag => allowedTagSet.has(tag))
+      const ingredientsNormal = (form.ingredients_normal || [])
+        .map(ing => ({
+          amount: ing?.amount ?? '',
+          unit: String(ing?.unit ?? '').trim(),
+          name: String(ing?.name ?? '').trim(),
+        }))
+        .filter(ing => ing.name)
+      const ingredientsBulk = (form.ingredients_bulk || [])
+        .map(ing => ({
+          amount: ing?.amount ?? '',
+          unit: String(ing?.unit ?? '').trim(),
+          name: String(ing?.name ?? '').trim(),
+        }))
+        .filter(ing => ing.name)
+
+      const payload = {
+        ...form,
+        tags,
+        ingredients_normal: ingredientsNormal,
+        ingredients_bulk: ingredientsBulk,
+      }
+      delete payload.ingredients
 
       let targetId = id
       await updateRecipes(recipes => {
         if (isEditing) {
-          return recipes.map(r => r.id === id ? { ...form, id, tags } : r)
+          return recipes.map(r => r.id === id ? { ...payload, id } : r)
         } else {
           targetId = Date.now().toString()
-          return [...recipes, { ...form, tags, id: targetId, created_at: new Date().toISOString() }]
+          return [...recipes, { ...payload, id: targetId, created_at: new Date().toISOString() }]
         }
       })
       sessionStorage.setItem(
@@ -308,31 +341,60 @@ export default function RecipeForm() {
       </section>
 
       {/* Ingredients */}
-      <section>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Ingredients</label>
-        <div className="space-y-2">
-          {form.ingredients.map((ing, i) => (
-            <div key={i} className="flex gap-2 items-center">
-              <input type="number" min="0" step="any" value={ing.amount}
-                onChange={e => setIng(i, 'amount', e.target.value)}
-                placeholder="Qty"
-                className="w-20 border border-gray-200 rounded px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-              <select value={ing.unit} onChange={e => setIng(i, 'unit', e.target.value)}
-                className="border border-gray-200 rounded px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
-                {UNITS.map(u => <option key={u} value={u}>{u || '—'}</option>)}
-              </select>
-              <input value={ing.name} onChange={e => setIng(i, 'name', e.target.value)}
-                placeholder="Ingredient"
-                className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
-              <button type="button" onClick={() => removeIng(i)}
-                className="text-gray-300 hover:text-red-400 text-xl leading-none transition-colors">×</button>
-            </div>
-          ))}
+      <section className="space-y-5">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Ingredients (Normal)</label>
+          <div className="space-y-2">
+            {(form.ingredients_normal || []).map((ing, i) => (
+              <div key={`normal-${i}`} className="flex gap-2 items-center">
+                <input type="number" min="0" step="any" value={ing.amount}
+                  onChange={e => setIng('ingredients_normal', i, 'amount', e.target.value)}
+                  placeholder="Qty"
+                  className="w-20 border border-gray-200 rounded px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                <select value={ing.unit} onChange={e => setIng('ingredients_normal', i, 'unit', e.target.value)}
+                  className="border border-gray-200 rounded px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
+                  {UNITS.map(u => <option key={u} value={u}>{u || '—'}</option>)}
+                </select>
+                <input value={ing.name} onChange={e => setIng('ingredients_normal', i, 'name', e.target.value)}
+                  placeholder="Ingredient"
+                  className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                <button type="button" onClick={() => removeIng('ingredients_normal', i)}
+                  className="text-gray-300 hover:text-red-400 text-xl leading-none transition-colors">×</button>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => addIng('ingredients_normal')}
+            className="mt-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            + Add normal ingredient
+          </button>
         </div>
-        <button type="button" onClick={addIng}
-          className="mt-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
-          + Add ingredient
-        </button>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Ingredients (Bulk / Pantry)</label>
+          <div className="space-y-2">
+            {(form.ingredients_bulk || []).map((ing, i) => (
+              <div key={`bulk-${i}`} className="flex gap-2 items-center">
+                <input type="number" min="0" step="any" value={ing.amount}
+                  onChange={e => setIng('ingredients_bulk', i, 'amount', e.target.value)}
+                  placeholder="Qty"
+                  className="w-20 border border-gray-200 rounded px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                <select value={ing.unit} onChange={e => setIng('ingredients_bulk', i, 'unit', e.target.value)}
+                  className="border border-gray-200 rounded px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300">
+                  {UNITS.map(u => <option key={u} value={u}>{u || '—'}</option>)}
+                </select>
+                <input value={ing.name} onChange={e => setIng('ingredients_bulk', i, 'name', e.target.value)}
+                  placeholder="Ingredient"
+                  className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                <button type="button" onClick={() => removeIng('ingredients_bulk', i)}
+                  className="text-gray-300 hover:text-red-400 text-xl leading-none transition-colors">×</button>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => addIng('ingredients_bulk')}
+            className="mt-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            + Add bulk/pantry ingredient
+          </button>
+        </div>
       </section>
 
       {/* Steps */}

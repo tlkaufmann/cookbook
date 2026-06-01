@@ -56,6 +56,41 @@ export function filterRecipeTags(tags, allowedTags) {
   return sanitizeTagList(tags).filter(tag => allowed.has(tag))
 }
 
+function normalizeIngredient(ingredient) {
+  if (!ingredient || typeof ingredient !== 'object') return null
+  const name = String(ingredient.name || '').trim()
+  if (!name) return null
+  return {
+    amount: ingredient.amount ?? '',
+    unit: String(ingredient.unit || '').trim(),
+    name,
+  }
+}
+
+export function getRecipeIngredientGroups(recipe) {
+  const normal = Array.isArray(recipe?.ingredients_normal)
+    ? recipe.ingredients_normal.map(normalizeIngredient).filter(Boolean)
+    : []
+  const bulk = Array.isArray(recipe?.ingredients_bulk)
+    ? recipe.ingredients_bulk.map(normalizeIngredient).filter(Boolean)
+    : []
+
+  // Backward compatibility with legacy single ingredients array.
+  if (normal.length === 0 && bulk.length === 0 && Array.isArray(recipe?.ingredients)) {
+    return {
+      normal: recipe.ingredients.map(normalizeIngredient).filter(Boolean),
+      bulk: [],
+    }
+  }
+
+  return { normal, bulk }
+}
+
+export function getAllRecipeIngredients(recipe) {
+  const { normal, bulk } = getRecipeIngredientGroups(recipe)
+  return [...normal, ...bulk]
+}
+
 function normalizeIngredientName(name) {
   return String(name || '')
     .trim()
@@ -130,44 +165,52 @@ export function buildShoppingListFromPlan(plan, recipes, dateRange) {
       const targetServings = Number(entry.servings) || baseServings
       const scale = targetServings / baseServings
 
-      for (const ingredient of recipe.ingredients || []) {
-        const name = String(ingredient.name || '').trim()
-        if (!name) continue
+      const ingredientGroups = getRecipeIngredientGroups(recipe)
+      const groupedEntries = [
+        { category: 'normal', items: ingredientGroups.normal },
+        { category: 'bulk', items: ingredientGroups.bulk },
+      ]
 
-        const unit = String(ingredient.unit || '').trim()
-        const normalizedName = normalizeIngredientName(name)
-        const numericAmount = parseAmountValue(ingredient.amount)
+      for (const group of groupedEntries) {
+        for (const ingredient of group.items) {
+          const name = String(ingredient.name || '').trim()
+          if (!name) continue
 
-        if (numericAmount == null) {
-          passthroughItems.push(createShoppingItem({
+          const unit = String(ingredient.unit || '').trim()
+          const normalizedName = normalizeIngredientName(name)
+          const numericAmount = parseAmountValue(ingredient.amount)
+
+          if (numericAmount == null) {
+            passthroughItems.push(createShoppingItem({
+              name,
+              amount: String(ingredient.amount || '').trim(),
+              unit,
+              note: recipe.title,
+              category: group.category,
+            }))
+            continue
+          }
+
+          const key = `${group.category}__${normalizedName}__${unit.toLowerCase()}`
+          const scaledAmount = numericAmount * scale
+          const existing = aggregated.get(key)
+
+          if (existing) {
+            existing.amount = formatScaledAmount(Number(existing.amount) + scaledAmount)
+            if (!existing.note.includes(recipe.title)) {
+              existing.note = `${existing.note}, ${recipe.title}`
+            }
+            continue
+          }
+
+          aggregated.set(key, createShoppingItem({
             name,
-            amount: String(ingredient.amount || '').trim(),
+            amount: formatScaledAmount(scaledAmount),
             unit,
             note: recipe.title,
-            category: 'normal',
+            category: group.category,
           }))
-          continue
         }
-
-        const key = `${normalizedName}__${unit.toLowerCase()}`
-        const scaledAmount = numericAmount * scale
-        const existing = aggregated.get(key)
-
-        if (existing) {
-          existing.amount = formatScaledAmount(Number(existing.amount) + scaledAmount)
-          if (!existing.note.includes(recipe.title)) {
-            existing.note = `${existing.note}, ${recipe.title}`
-          }
-          continue
-        }
-
-        aggregated.set(key, createShoppingItem({
-          name,
-          amount: formatScaledAmount(scaledAmount),
-          unit,
-          note: recipe.title,
-          category: 'normal',
-        }))
       }
     }
   }

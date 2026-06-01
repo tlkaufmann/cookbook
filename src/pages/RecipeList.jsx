@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
+import { getAllRecipeIngredients } from '../lib/planner'
 
 export default function RecipeList() {
   const [recipes, setRecipes] = useState([])
@@ -37,7 +38,7 @@ export default function RecipeList() {
         !q ||
         r.title.toLowerCase().includes(q) ||
         r.description?.toLowerCase().includes(q) ||
-        r.ingredients?.some(i => i.name.toLowerCase().includes(q))
+        getAllRecipeIngredients(r).some(i => i.name.toLowerCase().includes(q))
       const matchesTags = [...activeTags].every(t => r.tags?.includes(t))
       return matchesSearch && matchesTags
     })

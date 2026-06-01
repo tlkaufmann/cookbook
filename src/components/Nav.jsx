@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import ImportModal from './ImportModal'
+import DeployBadge from './DeployBadge'
 
 const LINKS = [
   { to: '/', label: 'Recipes' },
@@ -15,10 +16,13 @@ export default function Nav() {
   return (
     <>
       <nav className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#143109]/15">
-        <div className="max-w-3xl mx-auto px-4 flex items-center justify-between h-14">
-          <Link to="/" className="font-semibold text-[#143109] text-lg tracking-tight">
-            🍳 Cookbook
-          </Link>
+        <div className="max-w-3xl mx-auto gap-2 px-4 flex items-center justify-between h-14">
+          <div className="flex items-center gap-2">
+            <Link to="/" className="font-semibold text-[#143109] text-lg tracking-tight">
+              🍳 Cookbook
+            </Link>
+            <DeployBadge />
+          </div>
           <div className="flex items-center gap-1">
             {LINKS.map(l => (
               <Link

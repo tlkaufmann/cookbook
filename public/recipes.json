@@ -251,32 +251,13 @@
       {
         "amount": "",
         "unit": "",
-        "name": "Fresh ginger root"
-      },
-      {
-        "amount": "",
-        "unit": "",
-        "name": "Scallions"
-      },
-      {
-        "amount": "",
-        "unit": "",
         "name": "Toasted sesame seeds"
-      },
-      {
-        "amount": "",
-        "unit": "",
-        "name": "Chili paste, chili flakes, or sriracha (optional)"
       }
     ],
     "steps": [
       "Score the cucumber with the tines of a fork before slicing.",
-      "Optional: Salt the sliced cucumbers and place them in a strainer for 20 minutes or up to a few hours to release liquid. Discard the liquid.",
-      "Chop scallions. You can also use chives, cilantro, or Thai basil.",
-      "Combine the strained cucumbers (if salted), chopped scallions, seasoned rice vinegar, toasted sesame oil, soy sauce (or liquid amino acids), and sweetener in a salad bowl.",
-      "Grate fresh ginger into the salad bowl.",
+      "Combine the strained cucumbers (if salted), seasoned rice vinegar, toasted sesame oil, soy sauce, and sweetener in a salad bowl.",
       "Grate fresh garlic into the salad bowl.",
-      "Optional: Add red chili paste, chili flakes, or sriracha for heat.",
       "Mix all ingredients thoroughly and adjust salt and spice level to your liking.",
       "Garnish with toasted sesame seeds before serving."
     ],
@@ -449,7 +430,7 @@
       {
         "amount": 4,
         "unit": "tbsp",
-        "name": "tomato purÃÂÃÂ©e"
+        "name": "tomato purÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e"
       },
       {
         "amount": 0.5,
@@ -504,7 +485,7 @@
     ],
     "steps": [
       "To make the salsa, combine the red onions, tomatoes, vinegar, half the parsley and half the oil, then season to taste. Toss the avocado slices with a splash of the lime juice, and set aside.",
-      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purÃÂÃÂ©e and spices, and cook for 3-5 mins until the purÃÂÃÂ©e turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
+      "Heat the remaining oil in a non-stick pan over a medium-high heat and cook the onions for 5 mins, then stir in the grated carrot and mushrooms, and cook for 3-5 mins more until lightly browned. Mix in the tomato purÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e and spices, and cook for 3-5 mins until the purÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e turns dark red. Pour in 200ml water, the kidney beans, corn and remaining parsley. Cook for 5-6 mins until the mixture has reduced, thickened and is heated through. Season with the cayenne pepper and salt and pepper to taste.",
       "Warm the tortillas following pack instructions and reheat the rice until piping hot. Assemble the burritos by topping the tortillas with the lettuce, vegetable filling and rice. Dot over the avocado slices and soured cream, then fold in one side of the tortillas and roll up. Serve warm, with the salsa on the side."
     ],
     "source": "https://www.bbcgoodfood.com/recipes/veggie-burrito",
@@ -579,7 +560,7 @@
   },
   {
     "title": "Korean bibimbap",
-    "description": "Bibimbap is a Korean dish of warm rice topped with sautÃ©ed seasoned vegetables decorating the top. These vegetables are usually individually cooked and seasoned to ensure maximum flavour and colour from each vegetable. In this recipe, we still use a variety of vegetables but theyâre steamed to make things quicker - feel free to substitute for any other vegetables, just make sure to cut them finely so that they all have a similar cooking time. For extra flavour and freshness, you could also add a handful of rocket, watercress or other salad vegetables too.",
+    "description": "Bibimbap is a Korean dish of warm rice topped with sautÃ©ed seasoned vegetables decorating the top. These vegetables are usually individually cooked and seasoned to ensure maximum flavour and colour from each vegetable. In this recipe, we still use a variety of vegetables but theyÃ¢ÂÂre steamed to make things quicker - feel free to substitute for any other vegetables, just make sure to cut them finely so that they all have a similar cooking time. For extra flavour and freshness, you could also add a handful of rocket, watercress or other salad vegetables too.",
     "servings": 1,
     "prep_min": 10,
     "cook_min": 5,

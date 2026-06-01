@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { fetchHTML, extractRecipeFromHTML, validateRecipe, Logger } from '../lib/gemini'
-import { updateRecipes } from '../lib/github'
+import { fetchTags, getTags, updateRecipes } from '../lib/github'
+import { filterRecipeTags, sanitizeTagList } from '../lib/planner'
 
 function blankIngredient() {
   return { amount: '', unit: '', name: '' }
@@ -51,6 +52,7 @@ function LogViewer({ logs, onClose }) {
 export default function ImportModal({ onClose, onSuccess }) {
   const [apiKey, setApiKey] = useState('')
   const [urlsInput, setUrlsInput] = useState('')
+  const [availableTags, setAvailableTags] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [results, setResults] = useState([])
   const [selectedLog, setSelectedLog] = useState(null)
@@ -68,10 +70,44 @@ export default function ImportModal({ onClose, onSuccess }) {
   const failedResults = results.filter(r => r.status === 'error')
   const currentRecipe = reviewRecipes[reviewIndex] || null
 
+  useEffect(() => {
+    let alive = true
+
+    async function loadTags() {
+      try {
+        const { data } = await getTags()
+        const normalized = sanitizeTagList(data || [])
+        if (normalized.length > 0) {
+          if (!alive) return
+          setAvailableTags(normalized)
+          return
+        }
+
+        const publicData = await fetchTags()
+        if (!alive) return
+        setAvailableTags(sanitizeTagList(publicData || []))
+      } catch {
+        try {
+          const data = await fetchTags()
+          if (!alive) return
+          setAvailableTags(sanitizeTagList(data || []))
+        } catch {
+          if (!alive) return
+          setAvailableTags([])
+        }
+      }
+    }
+
+    loadTags()
+    return () => {
+      alive = false
+    }
+  }, [])
+
   function cloneRecipe(recipe) {
     return {
       ...recipe,
-      tags: Array.isArray(recipe.tags) ? [...recipe.tags] : [],
+      tags: filterRecipeTags(recipe.tags || [], availableTags),
       ingredients: Array.isArray(recipe.ingredients)
         ? recipe.ingredients.map(ing => ({
             amount: ing?.amount ?? '',
@@ -154,7 +190,7 @@ export default function ImportModal({ onClose, onSuccess }) {
         const html = await fetchHTML(url, logger)
 
         logger.log(`Starting recipe extraction`)
-        const recipe = await extractRecipeFromHTML(html, url, apiKey, logger)
+        const recipe = await extractRecipeFromHTML(html, url, apiKey, logger, availableTags)
 
         logger.log(`Starting validation`)
         validateRecipe(recipe, logger)
@@ -197,7 +233,7 @@ export default function ImportModal({ onClose, onSuccess }) {
       prep_min: Number(recipe.prep_min) >= 0 ? Number(recipe.prep_min) : 0,
       cook_min: Number(recipe.cook_min) >= 0 ? Number(recipe.cook_min) : 0,
       tags: Array.isArray(recipe.tags)
-        ? recipe.tags.map(t => String(t).trim()).filter(Boolean)
+        ? filterRecipeTags(recipe.tags, availableTags)
         : [],
       ingredients: Array.isArray(recipe.ingredients)
         ? recipe.ingredients
@@ -232,6 +268,23 @@ export default function ImportModal({ onClose, onSuccess }) {
     } catch (err) {
       alert(`Failed to save recipes: ${err.message}`)
     }
+  }
+
+  function toggleReviewTag(tag) {
+    updateCurrentRecipe(recipe => {
+      const hasTag = (recipe.tags || []).includes(tag)
+      if (hasTag) {
+        return {
+          ...recipe,
+          tags: (recipe.tags || []).filter(t => t !== tag),
+        }
+      }
+
+      return {
+        ...recipe,
+        tags: sanitizeTagList([...(recipe.tags || []), tag]),
+      }
+    })
   }
 
   return (
@@ -342,18 +395,32 @@ export default function ImportModal({ onClose, onSuccess }) {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Tags (comma-separated)</label>
-                    <input
-                      value={Array.isArray(currentRecipe.tags) ? currentRecipe.tags.join(', ') : ''}
-                      onChange={e => {
-                        const tags = e.target.value
-                          .split(',')
-                          .map(t => t.trim().toLowerCase())
-                          .filter(Boolean)
-                        updateCurrentRecipe(recipe => ({ ...recipe, tags }))
-                      }}
-                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
-                    />
+                    <label className="block text-xs font-medium text-gray-600 mb-2">Tags</label>
+                    {availableTags.length === 0 ? (
+                      <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+                        No tags available. Add tags in the Tags tab first.
+                      </p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {availableTags.map(tag => {
+                          const active = (currentRecipe.tags || []).includes(tag)
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => toggleReviewTag(tag)}
+                              className={`px-2.5 py-1 rounded-full text-xs border transition-colors ${
+                                active
+                                  ? 'bg-[#143109] text-white border-[#143109]'
+                                  : 'bg-white text-[#143109] border-[#143109]/30 hover:bg-[#143109]/5'
+                              }`}
+                            >
+                              {tag}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">

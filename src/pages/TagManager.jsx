@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import TagPill from '../components/TagPill'
-import { getRecipes, updateRecipes } from '../lib/github'
-import { normalizeTag } from '../lib/planner'
-
-function sortTags(tags) {
-  return [...new Set(tags)].sort((left, right) => left.localeCompare(right))
-}
+import { fetchTags, getRecipes, getTags, updateRecipes, updateTags } from '../lib/github'
+import { filterRecipeTags, normalizeTag, sanitizeTagList, sortTags } from '../lib/planner'
 
 export default function TagManager() {
   const [recipes, setRecipes] = useState([])
   const [draftRecipes, setDraftRecipes] = useState([])
+  const [tags, setTags] = useState([])
+  const [draftTags, setDraftTags] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [newTagInput, setNewTagInput] = useState('')
   const [bulkTagInput, setBulkTagInput] = useState('')
   const [bulkRemoveTag, setBulkRemoveTag] = useState('')
   const [rowTagInputs, setRowTagInputs] = useState({})
@@ -25,10 +24,28 @@ export default function TagManager() {
 
     async function load() {
       try {
-        const { data } = await getRecipes()
+        const [{ data: recipesData }, tagsResponse] = await Promise.all([
+          getRecipes(),
+          getTags(),
+        ])
         if (!alive) return
-        setRecipes(data)
-        setDraftRecipes(data)
+
+        let allowedTags = sanitizeTagList(tagsResponse?.data || [])
+        if (allowedTags.length === 0) {
+          const publicTags = await fetchTags()
+          if (!alive) return
+          allowedTags = sanitizeTagList(publicTags || [])
+        }
+
+        const sanitizedRecipes = (recipesData || []).map(recipe => ({
+          ...recipe,
+          tags: filterRecipeTags(recipe.tags || [], allowedTags),
+        }))
+
+        setRecipes(sanitizedRecipes)
+        setDraftRecipes(sanitizedRecipes)
+        setTags(allowedTags)
+        setDraftTags(allowedTags)
       } catch (loadError) {
         if (!alive) return
         setError(loadError.message)
@@ -60,31 +77,48 @@ export default function TagManager() {
       }
     }
 
-    return [...counts.entries()]
-      .sort((left, right) => left[0].localeCompare(right[0]))
-      .map(([tag, count]) => ({ tag, count }))
-  }, [draftRecipes])
+    return draftTags.map(tag => ({ tag, count: counts.get(tag) || 0 }))
+  }, [draftRecipes, draftTags])
 
-  const hasChanges = useMemo(() => {
+  const hasRecipeChanges = useMemo(() => {
     return JSON.stringify(recipes) !== JSON.stringify(draftRecipes)
   }, [draftRecipes, recipes])
 
+  const hasTagChanges = useMemo(() => {
+    return JSON.stringify(tags) !== JSON.stringify(draftTags)
+  }, [draftTags, tags])
+
+  const hasChanges = hasRecipeChanges || hasTagChanges
+
   function updateRecipeTags(recipeId, updater) {
+    const allowedTags = new Set(draftTags)
     setDraftRecipes(prev => prev.map(recipe => {
       if (recipe.id !== recipeId) return recipe
       return {
         ...recipe,
-        tags: sortTags(updater(recipe.tags || [])),
+        tags: sortTags(updater(recipe.tags || []).filter(tag => allowedTags.has(tag))),
       }
     }))
   }
 
-  function addTagToRecipe(recipeId, rawTag) {
-    const nextTag = normalizeTag(rawTag)
-    if (!nextTag) return
+  function addTagToRecipe(recipeId, selectedTag) {
+    if (!selectedTag || !draftTags.includes(selectedTag)) return
 
-    updateRecipeTags(recipeId, tags => (tags.includes(nextTag) ? tags : [...tags, nextTag]))
+    updateRecipeTags(recipeId, tags => (tags.includes(selectedTag) ? tags : [...tags, selectedTag]))
     setRowTagInputs(prev => ({ ...prev, [recipeId]: '' }))
+    setNotice('')
+  }
+
+  function addGlobalTag() {
+    const nextTag = normalizeTag(newTagInput)
+    if (!nextTag) return
+    if (draftTags.includes(nextTag)) {
+      setNotice(`Tag "${nextTag}" already exists.`)
+      return
+    }
+
+    setDraftTags(prev => sortTags([...prev, nextTag]))
+    setNewTagInput('')
     setNotice('')
   }
 
@@ -111,15 +145,14 @@ export default function TagManager() {
   }
 
   function applyTagToSelected() {
-    const nextTag = normalizeTag(bulkTagInput)
-    if (!nextTag || selectedIds.size === 0) return
+    if (!bulkTagInput || selectedIds.size === 0 || !draftTags.includes(bulkTagInput)) return
 
     setDraftRecipes(prev => prev.map(recipe => {
       if (!selectedIds.has(recipe.id)) return recipe
       const tags = recipe.tags || []
       return {
         ...recipe,
-        tags: tags.includes(nextTag) ? tags : sortTags([...tags, nextTag]),
+        tags: tags.includes(bulkTagInput) ? tags : sortTags([...tags, bulkTagInput]),
       }
     }))
     setBulkTagInput('')
@@ -140,9 +173,10 @@ export default function TagManager() {
   }
 
   function removeTagEverywhere(tagToRemove) {
-    const confirmed = window.confirm(`Remove "${tagToRemove}" from every recipe?`)
+    const confirmed = window.confirm(`Remove "${tagToRemove}" from the tags list and every recipe?`)
     if (!confirmed) return
 
+    setDraftTags(prev => prev.filter(tag => tag !== tagToRemove))
     setDraftRecipes(prev => prev.map(recipe => ({
       ...recipe,
       tags: (recipe.tags || []).filter(tag => tag !== tagToRemove),
@@ -155,12 +189,26 @@ export default function TagManager() {
     setError('')
 
     try {
-      const draftById = Object.fromEntries(draftRecipes.map(recipe => [recipe.id, recipe]))
-      await updateRecipes(currentRecipes => currentRecipes.map(recipe => {
-        const draft = draftById[recipe.id]
-        return draft ? { ...recipe, tags: draft.tags || [] } : recipe
-      }))
+      if (hasTagChanges) {
+        await updateTags(() => draftTags)
+      }
+
+      if (hasRecipeChanges) {
+        const allowedTags = new Set(draftTags)
+        const draftById = Object.fromEntries(draftRecipes.map(recipe => [recipe.id, recipe]))
+
+        await updateRecipes(currentRecipes => currentRecipes.map(recipe => {
+          const draft = draftById[recipe.id]
+          if (!draft) return recipe
+          return {
+            ...recipe,
+            tags: sortTags(draft.tags || []).filter(tag => allowedTags.has(tag)),
+          }
+        }))
+      }
+
       setRecipes(draftRecipes)
+      setTags(draftTags)
       setNotice('Tag changes saved. The site will reflect them after the next deploy finishes.')
     } catch (saveError) {
       setError(saveError.message)
@@ -179,7 +227,7 @@ export default function TagManager() {
         <div>
           <h1 className="text-xl font-bold text-gray-900">Tag editor</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Remove noisy tags globally or apply a tag across a batch of recipes before saving once.
+            Add tags here, then assign existing tags to recipes in bulk or per recipe.
           </p>
         </div>
         <button
@@ -213,20 +261,43 @@ export default function TagManager() {
         </div>
 
         <div className="rounded-xl border border-[#143109]/10 bg-white/80 p-4 space-y-3">
-          <label className="block text-sm font-medium text-gray-700">Bulk tag actions</label>
+          <label className="block text-sm font-medium text-gray-700">Add tag</label>
           <div className="flex gap-2">
             <input
-              value={bulkTagInput}
-              onChange={event => setBulkTagInput(event.target.value)}
+              value={newTagInput}
+              onChange={event => setNewTagInput(event.target.value)}
               onKeyDown={event => {
                 if (event.key === 'Enter') {
                   event.preventDefault()
-                  applyTagToSelected()
+                  addGlobalTag()
                 }
               }}
-              placeholder="Add tag to selected recipes"
+              placeholder="e.g. vegetarian"
               className="flex-1 border border-[#143109]/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#143109]/20"
             />
+            <button
+              onClick={addGlobalTag}
+              disabled={!normalizeTag(newTagInput)}
+              className="border border-[#143109]/20 rounded-lg px-3 py-2 text-sm text-[#143109] hover:bg-[#143109]/5 disabled:opacity-40 transition-colors"
+            >
+              Add tag
+            </button>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-[#143109]/10 bg-white/80 p-4 space-y-3">
+          <label className="block text-sm font-medium text-gray-700">Bulk tag actions</label>
+          <div className="flex gap-2">
+            <select
+              value={bulkTagInput}
+              onChange={event => setBulkTagInput(event.target.value)}
+              className="flex-1 border border-[#143109]/20 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#143109]/20"
+            >
+              <option value="">Add existing tag to selected recipes</option>
+              {draftTags.map(tag => (
+                <option key={tag} value={tag}>{tag}</option>
+              ))}
+            </select>
             <button
               onClick={applyTagToSelected}
               disabled={!bulkTagInput || selectedIds.size === 0}
@@ -242,7 +313,7 @@ export default function TagManager() {
               className="flex-1 border border-[#143109]/20 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#143109]/20"
             >
               <option value="">Remove tag from selected recipes</option>
-              {allTags.map(({ tag }) => (
+              {draftTags.map(tag => (
                 <option key={tag} value={tag}>{tag}</option>
               ))}
             </select>
@@ -260,7 +331,7 @@ export default function TagManager() {
       <div className="rounded-xl border border-[#143109]/10 bg-white/80 p-4 space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">Global tags</h2>
-          <span className="text-xs text-gray-400">Remove from all recipes in one click</span>
+          <span className="text-xs text-gray-400">Stored in public/tags.json</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {allTags.length === 0 && <span className="text-sm text-gray-400">No tags yet.</span>}
@@ -287,7 +358,7 @@ export default function TagManager() {
               <th className="px-4 py-3 w-12">Pick</th>
               <th className="px-4 py-3 min-w-[220px]">Recipe</th>
               <th className="px-4 py-3 min-w-[280px]">Tags</th>
-              <th className="px-4 py-3 min-w-[220px]">Quick add</th>
+              <th className="px-4 py-3 min-w-[240px]">Add existing tag</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#143109]/10 text-sm">
@@ -319,21 +390,21 @@ export default function TagManager() {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
-                    <input
+                    <select
                       value={rowTagInputs[recipe.id] || ''}
                       onChange={event => setRowTagInputs(prev => ({ ...prev, [recipe.id]: event.target.value }))}
-                      onKeyDown={event => {
-                        if (event.key === 'Enter') {
-                          event.preventDefault()
-                          addTagToRecipe(recipe.id, rowTagInputs[recipe.id])
-                        }
-                      }}
-                      placeholder="new tag"
-                      className="flex-1 border border-[#143109]/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#143109]/20"
-                    />
+                      className="flex-1 border border-[#143109]/20 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#143109]/20"
+                    >
+                      <option value="">Select tag</option>
+                      {draftTags
+                        .filter(tag => !(recipe.tags || []).includes(tag))
+                        .map(tag => (
+                          <option key={`${recipe.id}-${tag}`} value={tag}>{tag}</option>
+                        ))}
+                    </select>
                     <button
                       onClick={() => addTagToRecipe(recipe.id, rowTagInputs[recipe.id])}
-                      disabled={!normalizeTag(rowTagInputs[recipe.id])}
+                      disabled={!rowTagInputs[recipe.id]}
                       className="border border-[#143109]/20 rounded-lg px-3 py-2 text-sm text-[#143109] hover:bg-[#143109]/5 disabled:opacity-40 transition-colors"
                     >
                       Add

@@ -6,11 +6,7 @@
     "servings": 6,
     "prep_min": 20,
     "cook_min": 80,
-    "tags": [
-      "italian",
-      "vegetarian",
-      "dinner"
-    ],
+    "tags": [],
     "ingredients": [
       {
         "amount": 2,
@@ -105,11 +101,7 @@
     "servings": 2,
     "prep_min": 30,
     "cook_min": 0,
-    "tags": [
-      "thai",
-      "vegetarian",
-      "noodles"
-    ],
+    "tags": [],
     "ingredients": [
       {
         "amount": 100,
@@ -210,12 +202,7 @@
     "cook_min": 0,
     "tags": [
       "asian",
-      "cucumber",
-      "salad",
-      "vegan",
-      "gluten-free",
-      "refreshing",
-      "side dish"
+      "salad"
     ],
     "ingredients": [
       {
@@ -273,14 +260,8 @@
     "prep_min": 15,
     "cook_min": 15,
     "tags": [
-      "vegetarian",
-      "gorgonzola",
       "pasta",
-      "mushrooms",
-      "creamy",
-      "quick",
-      "easy",
-      "weeknight"
+      "quick"
     ],
     "ingredients": [
       {
@@ -369,13 +350,7 @@
     "servings": 8,
     "prep_min": 15,
     "cook_min": 20,
-    "tags": [
-      "vegetarian",
-      "burrito",
-      "mexican",
-      "dinner",
-      "main"
-    ],
+    "tags": [],
     "ingredients": [
       {
         "amount": 1,
@@ -499,13 +474,7 @@
     "servings": 6,
     "prep_min": 20,
     "cook_min": 30,
-    "tags": [
-      "courgette",
-      "lasagne",
-      "vegetarian",
-      "midweek meal",
-      "family"
-    ],
+    "tags": [],
     "ingredients": [
       {
         "amount": 9,
@@ -565,12 +534,6 @@
     "prep_min": 10,
     "cook_min": 5,
     "tags": [
-      "korean",
-      "bibimbap",
-      "vegetarian",
-      "rice",
-      "egg",
-      "vegetables",
       "quick"
     ],
     "ingredients": [

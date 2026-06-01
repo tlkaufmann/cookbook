@@ -110,9 +110,17 @@ export async function fetchRecipes() {
   return normalizeTextDeep(data)
 }
 
+export async function fetchTags() {
+  const res = await fetch(`${import.meta.env.BASE_URL}tags.json?t=${Date.now()}`)
+  if (!res.ok) return []
+  const data = await res.json()
+  return normalizeTextDeep(data)
+}
+
 // --- Authenticated API access (for planner and recipe form writes) ---
 
 export const getRecipes = () => readFile('public/recipes.json')
+export const getTags = () => readFile('public/tags.json')
 
 // Per-file write queues — serialize concurrent writes to prevent SHA conflicts.
 // Each enqueued update reads a fresh SHA immediately before writing, so rapid
@@ -140,6 +148,7 @@ function enqueueUpdate(path, updateFn) {
 }
 
 export const updateRecipes = (fn) => enqueueUpdate('public/recipes.json', fn)
+export const updateTags = (fn) => enqueueUpdate('public/tags.json', fn)
 
 // --- Auth validation ---
 

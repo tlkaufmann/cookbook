@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getRecipes, updateRecipes } from '../lib/github'
+import { fetchTags, getRecipes, getTags, updateRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
+import { filterRecipeTags, sanitizeTagList } from '../lib/planner'
 
 const UNITS = ['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', '']
 
@@ -21,7 +22,7 @@ export default function RecipeForm() {
   const isEditing = !!id
 
   const [form, setForm] = useState(blankRecipe())
-  const [tagInput, setTagInput] = useState('')
+  const [selectedTag, setSelectedTag] = useState('')
   const [allTags, setAllTags] = useState([])
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -29,16 +30,55 @@ export default function RecipeForm() {
   const [loading, setLoading] = useState(isEditing)
 
   useEffect(() => {
-    getRecipes().then(({ data }) => {
-      const tags = new Set()
-      data.forEach(r => r.tags?.forEach(t => tags.add(t)))
-      setAllTags([...tags].sort())
-      if (isEditing) {
-        const recipe = data.find(r => r.id === id)
-        if (recipe) setForm(recipe)
-      }
-      setLoading(false)
-    })
+    let alive = true
+
+    Promise.all([getRecipes(), getTags()])
+      .then(([recipesResponse, tagsResponse]) => {
+        if (!alive) return
+
+        const recipes = recipesResponse.data || []
+        const initialAllowed = sanitizeTagList(tagsResponse.data || [])
+
+        const applyTags = allowedTags => {
+          setAllTags(allowedTags)
+
+          if (isEditing) {
+            const recipe = recipes.find(r => r.id === id)
+            if (recipe) {
+              setForm({
+                ...recipe,
+                tags: filterRecipeTags(recipe.tags || [], allowedTags),
+              })
+            }
+          }
+        }
+
+        if (initialAllowed.length > 0) {
+          applyTags(initialAllowed)
+          return
+        }
+
+        fetchTags()
+          .then(publicTags => {
+            if (!alive) return
+            applyTags(sanitizeTagList(publicTags || []))
+          })
+          .catch(() => {
+            if (!alive) return
+            applyTags(initialAllowed)
+          })
+      })
+      .catch(loadError => {
+        if (!alive) return
+        setError(loadError.message)
+      })
+      .finally(() => {
+        if (alive) setLoading(false)
+      })
+
+    return () => {
+      alive = false
+    }
   }, [id, isEditing])
 
   function field(key, value) {
@@ -73,29 +113,28 @@ export default function RecipeForm() {
   }
 
   // Tag helpers
-  function addTag(raw) {
-    const t = raw.trim().toLowerCase().replace(/,/g, '')
-    if (t && !form.tags.includes(t)) setForm(prev => ({ ...prev, tags: [...prev.tags, t] }))
-    setTagInput('')
+  function addTag(tag) {
+    if (!tag || form.tags.includes(tag)) return
+    setForm(prev => ({ ...prev, tags: [...prev.tags, tag] }))
+    setSelectedTag('')
   }
   function removeTag(tag) { setForm(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) })) }
-
-  const tagSuggestions = tagInput
-    ? allTags.filter(t => t.includes(tagInput.toLowerCase()) && !form.tags.includes(t)).slice(0, 6)
-    : []
 
   async function handleSave() {
     if (!form.title.trim()) { setError('Title is required.'); return }
     setSaving(true)
     setError('')
     try {
+      const allowedTagSet = new Set(allTags)
+      const tags = sanitizeTagList(form.tags).filter(tag => allowedTagSet.has(tag))
+
       let targetId = id
       await updateRecipes(recipes => {
         if (isEditing) {
-          return recipes.map(r => r.id === id ? { ...form, id } : r)
+          return recipes.map(r => r.id === id ? { ...form, id, tags } : r)
         } else {
           targetId = Date.now().toString()
-          return [...recipes, { ...form, id: targetId, created_at: new Date().toISOString() }]
+          return [...recipes, { ...form, tags, id: targetId, created_at: new Date().toISOString() }]
         }
       })
       sessionStorage.setItem(
@@ -243,25 +282,29 @@ export default function RecipeForm() {
         <div className="flex flex-wrap gap-1.5 mb-2">
           {form.tags.map(tag => <TagPill key={tag} tag={tag} onRemove={removeTag} />)}
         </div>
-        <div className="relative">
-          <input
-            value={tagInput}
-            onChange={e => setTagInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(tagInput) } }}
-            className={inputCls}
-            placeholder="Add tag — press Enter or comma to confirm"
-          />
-          {tagSuggestions.length > 0 && (
-            <div className="absolute z-10 top-full left-0 right-0 bg-white border border-gray-200 rounded-b shadow-sm">
-              {tagSuggestions.map(t => (
-                <button key={t} type="button" onClick={() => addTag(t)}
-                  className="block w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
-                  {t}
-                </button>
+        <div className="flex gap-2">
+          <select
+            value={selectedTag}
+            onChange={e => setSelectedTag(e.target.value)}
+            className={`${inputCls} bg-white`}
+          >
+            <option value="">Select existing tag</option>
+            {allTags
+              .filter(tag => !form.tags.includes(tag))
+              .map(tag => (
+                <option key={tag} value={tag}>{tag}</option>
               ))}
-            </div>
-          )}
+          </select>
+          <button
+            type="button"
+            onClick={() => addTag(selectedTag)}
+            disabled={!selectedTag}
+            className="border border-[#143109]/20 rounded-lg px-3 py-2 text-sm text-[#143109] hover:bg-[#143109]/5 disabled:opacity-40 transition-colors"
+          >
+            Add tag
+          </button>
         </div>
+        <p className="mt-2 text-xs text-gray-500">Create new tags in the Tags tab.</p>
       </section>
 
       {/* Ingredients */}

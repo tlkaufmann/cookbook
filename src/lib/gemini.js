@@ -1,3 +1,5 @@
+import { filterRecipeTags, sanitizeTagList } from './planner'
+
 const CORS_PROXY = 'https://api.allorigins.win/raw?url='
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
 const GEMINI_LIST_MODELS_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
@@ -340,8 +342,11 @@ function normalizeTextDeep(value) {
   return value
 }
 
-function normalizeRecipe(recipe, logger) {
+function normalizeRecipe(recipe, logger, allowedTags = []) {
   recipe = normalizeTextDeep(recipe)
+
+  recipe.tags = filterRecipeTags(recipe.tags || [], allowedTags)
+  logger?.log(`Normalized tags to allowed list: ${recipe.tags.join(', ') || '(none)'}`)
 
   if (!Array.isArray(recipe.ingredients)) return recipe
 
@@ -457,12 +462,14 @@ export async function fetchHTML(url, logger) {
 /**
  * Call Gemini Flash API to extract recipe from HTML
  */
-export async function extractRecipeFromHTML(html, sourceUrl, apiKey, logger) {
+export async function extractRecipeFromHTML(html, sourceUrl, apiKey, logger, allowedTags = []) {
   try {
     const ogImage = extractOGImage(html)
     logger?.log(`Extracted Open Graph image: ${ogImage || 'not found'}`)
     const fallbackImage = ogImage ? null : extractFallbackImageNearTitle(html, logger)
     const imageHint = ogImage || fallbackImage
+
+    const allowedTagList = sanitizeTagList(allowedTags)
 
     const systemPrompt = `You are a recipe extraction assistant. Extract recipe information from the provided HTML and return ONLY valid JSON (no markdown, no code blocks, just raw JSON).
 
@@ -471,7 +478,8 @@ ${JSON.stringify(RECIPE_SCHEMA, null, 2)}
 
 Rules:
 - All fields are required except 'image' and 'description'
-- Tags should be lowercase, single words or short phrases
+- Tags must come only from this allowed list: ${allowedTagList.join(', ') || '(none)'}
+- Include only relevant tags from that allowed list. If none are relevant, return an empty tags array.
 - Amounts can be decimal numbers
 - Units must be one of: g, kg, ml, l, tsp, tbsp, cup, oz, lb, or empty string
 - Times should be in minutes (integers)
@@ -561,7 +569,7 @@ ${imageHint ? `- Preferred image URL for this page is: ${imageHint}` : ''}
       throw new Error('Invalid JSON from Gemini')
     }
 
-    recipe = normalizeRecipe(recipe, logger)
+    recipe = normalizeRecipe(recipe, logger, allowedTagList)
 
     // Add source URL
     recipe.source = sourceUrl

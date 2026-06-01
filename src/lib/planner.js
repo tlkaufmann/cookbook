@@ -43,6 +43,19 @@ export function normalizeTag(value) {
     .replace(/\s+/g, ' ')
 }
 
+export function sortTags(tags) {
+  return [...new Set(tags)].sort((left, right) => left.localeCompare(right))
+}
+
+export function sanitizeTagList(tags) {
+  return sortTags((tags || []).map(normalizeTag).filter(Boolean))
+}
+
+export function filterRecipeTags(tags, allowedTags) {
+  const allowed = new Set(sanitizeTagList(allowedTags))
+  return sanitizeTagList(tags).filter(tag => allowed.has(tag))
+}
+
 function normalizeIngredientName(name) {
   return String(name || '')
     .trim()

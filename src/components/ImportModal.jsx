@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { fetchHTML, extractRecipeFromHTML, validateRecipe, Logger } from '../lib/gemini'
-import { getRecipes, saveRecipes } from '../lib/github'
+import { updateRecipes } from '../lib/github'
 
 function LogViewer({ logs, onClose }) {
   return (
@@ -121,15 +121,14 @@ export default function ImportModal({ onClose, onSuccess }) {
     }
 
     try {
-      const { data: recipes, sha } = await getRecipes()
-
-      const newRecipes = recipesToAdd.map(recipe => ({
-        ...recipe,
-        id: Date.now().toString() + Math.random(),
-        created_at: new Date().toISOString(),
-      }))
-
-      await saveRecipes([...recipes, ...newRecipes], sha)
+      await updateRecipes(recipes => {
+        const newRecipes = recipesToAdd.map(recipe => ({
+          ...recipe,
+          id: Date.now().toString() + Math.random(),
+          created_at: new Date().toISOString(),
+        }))
+        return [...recipes, ...newRecipes]
+      })
       onSuccess()
       onClose()
     } catch (err) {

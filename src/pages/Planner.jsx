@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchRecipes, getMealPlan, saveMealPlan } from '../lib/github'
+import { fetchRecipes, getMealPlan, updateMealPlan } from '../lib/github'
 
 const SLOTS = ['breakfast', 'lunch', 'dinner', 'snack']
 
@@ -24,7 +24,6 @@ export default function Planner() {
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()))
   const [recipes, setRecipes] = useState([])
   const [plan, setPlan] = useState({})
-  const [sha, setSha] = useState(null)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   // Picker
@@ -38,7 +37,7 @@ export default function Planner() {
 
   useEffect(() => {
     fetchRecipes().then(setRecipes)
-    getMealPlan().then(({ data, sha }) => { setPlan(data); setSha(sha) })
+    getMealPlan().then(({ data }) => { setPlan(data) })
   }, [])
 
   function getEntries(date, slot) {
@@ -80,8 +79,7 @@ export default function Planner() {
   async function handleSave() {
     setSaving(true)
     try {
-      const result = await saveMealPlan(plan, sha)
-      setSha(result.content.sha) // update SHA from response for future saves
+      await updateMealPlan(() => plan)
       setDirty(false)
     } catch (e) {
       alert('Save failed: ' + e.message)

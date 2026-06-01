@@ -65,10 +65,25 @@ export async function fetchMealPlan() {
 export const getRecipes = () => readFile('public/recipes.json')
 export const getMealPlan = () => readFile('public/meal_plan.json')
 
-export const saveRecipes = (data, sha) =>
-  writeFile('public/recipes.json', data, sha, 'Update recipes')
-export const saveMealPlan = (data, sha) =>
-  writeFile('public/meal_plan.json', data, sha, 'Update meal plan')
+// Per-file write queues — serialize concurrent writes to prevent SHA conflicts.
+// Each enqueued update reads a fresh SHA immediately before writing, so rapid
+// successive saves never collide even if the previous commit just landed.
+const writeQueues = {}
+
+function enqueueUpdate(path, updateFn) {
+  if (!writeQueues[path]) writeQueues[path] = Promise.resolve()
+  const next = writeQueues[path].then(async () => {
+    const { data, sha } = await readFile(path)
+    const newData = await updateFn(data)
+    return writeFile(path, newData, sha, `Update ${path.split('/').pop()}`)
+  })
+  // Don't let a failure poison the queue for future writes
+  writeQueues[path] = next.catch(() => {})
+  return next
+}
+
+export const updateRecipes = (fn) => enqueueUpdate('public/recipes.json', fn)
+export const updateMealPlan = (fn) => enqueueUpdate('public/meal_plan.json', fn)
 
 // --- Auth validation ---
 

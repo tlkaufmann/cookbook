@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { fetchRecipes, getRecipes, getMealPlan, saveRecipes, saveMealPlan } from '../lib/github'
+import { fetchRecipes, updateRecipes, updateMealPlan } from '../lib/github'
 import TagPill from '../components/TagPill'
 
 const UNITS = ['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', '']
@@ -89,18 +89,15 @@ export default function RecipeForm() {
     setSaving(true)
     setError('')
     try {
-      const { data: recipes, sha } = await getRecipes()
-      let updated
       let targetId = id
-
-      if (isEditing) {
-        updated = recipes.map(r => r.id === id ? { ...form, id } : r)
-      } else {
-        targetId = Date.now().toString()
-        updated = [...recipes, { ...form, id: targetId, created_at: new Date().toISOString() }]
-      }
-
-      await saveRecipes(updated, sha)
+      await updateRecipes(recipes => {
+        if (isEditing) {
+          return recipes.map(r => r.id === id ? { ...form, id } : r)
+        } else {
+          targetId = Date.now().toString()
+          return [...recipes, { ...form, id: targetId, created_at: new Date().toISOString() }]
+        }
+      })
       navigate(`/recipe/${targetId}`, { replace: true })
     } catch (e) {
       setError(e.message)
@@ -117,21 +114,13 @@ export default function RecipeForm() {
     setError('')
 
     try {
-      const [{ data: recipes, sha: recipesSha }, { data: mealPlan, sha: mealPlanSha }] = await Promise.all([
-        getRecipes(),
-        getMealPlan(),
-      ])
-
-      const nextRecipes = recipes.filter(r => r.id !== id)
-      const nextMealPlan = Object.fromEntries(
-        Object.entries(mealPlan)
-          .map(([date, entries]) => [date, entries.filter(entry => entry.recipe_id !== id)])
-          .filter(([, entries]) => entries.length > 0)
-      )
-
       await Promise.all([
-        saveRecipes(nextRecipes, recipesSha),
-        saveMealPlan(nextMealPlan, mealPlanSha),
+        updateRecipes(recipes => recipes.filter(r => r.id !== id)),
+        updateMealPlan(mealPlan => Object.fromEntries(
+          Object.entries(mealPlan)
+            .map(([date, entries]) => [date, entries.filter(e => e.recipe_id !== id)])
+            .filter(([, entries]) => entries.length > 0)
+        )),
       ])
 
       navigate('/', { replace: true })

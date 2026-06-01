@@ -39,9 +39,18 @@ async function writeFile(path, data, sha, message) {
   )
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(err.message || `GitHub write failed: ${path}`)
+    const e = new Error(err.message || `GitHub write failed: ${path}`)
+    e.status = res.status
+    throw e
   }
   return res.json() // returns { content: { sha: "new-sha" }, commit: {...} }
+}
+
+function isShaConflict(error) {
+  if (!error) return false
+  if (error.status === 409) return true
+  const msg = String(error.message || '')
+  return msg.includes(' is at ') && msg.includes(' but expected ')
 }
 
 // --- Public static fetches (no auth, for reading in browse/shopping views) ---
@@ -64,9 +73,17 @@ const writeQueues = {}
 function enqueueUpdate(path, updateFn) {
   if (!writeQueues[path]) writeQueues[path] = Promise.resolve()
   const next = writeQueues[path].then(async () => {
-    const { data, sha } = await readFile(path)
-    const newData = await updateFn(data)
-    return writeFile(path, newData, sha, `Update ${path.split('/').pop()}`)
+    // Retry a few times on SHA mismatch to handle concurrent writes from
+    // another client/tab/process between read and write.
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const { data, sha } = await readFile(path)
+      const newData = await updateFn(data)
+      try {
+        return await writeFile(path, newData, sha, `Update ${path.split('/').pop()}`)
+      } catch (error) {
+        if (!isShaConflict(error) || attempt === 3) throw error
+      }
+    }
   })
   // Don't let a failure poison the queue for future writes
   writeQueues[path] = next.catch(() => {})

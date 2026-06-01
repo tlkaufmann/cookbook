@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { fetchRecipes, fetchMealPlan } from '../lib/github'
+import { fetchRecipes } from '../lib/github'
 
 function getMonday(date) {
   const d = new Date(date)
@@ -57,9 +57,7 @@ export default function ShoppingList() {
   )
 
   useEffect(() => {
-    Promise.all([fetchRecipes(), fetchMealPlan()]).then(([r, p]) => {
-      setRecipes(r); setPlan(p); setLoading(false)
-    })
+    fetchRecipes().then(r => { setRecipes(r); setLoading(false) })
   }, [])
 
   const items = useMemo(() => buildList(plan, recipes, dateRange), [plan, recipes, dateRange])

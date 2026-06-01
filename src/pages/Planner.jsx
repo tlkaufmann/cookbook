@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchRecipes, getMealPlan, updateMealPlan } from '../lib/github'
+import { fetchRecipes } from '../lib/github'
 
 const SLOTS = ['breakfast', 'lunch', 'dinner', 'snack']
 
@@ -24,8 +24,6 @@ export default function Planner() {
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()))
   const [recipes, setRecipes] = useState([])
   const [plan, setPlan] = useState({})
-  const [dirty, setDirty] = useState(false)
-  const [saving, setSaving] = useState(false)
   // Picker
   const [pickerTarget, setPickerTarget] = useState(null) // { date, slot }
   const [pickerSearch, setPickerSearch] = useState('')
@@ -37,7 +35,6 @@ export default function Planner() {
 
   useEffect(() => {
     fetchRecipes().then(setRecipes)
-    getMealPlan().then(({ data }) => { setPlan(data) })
   }, [])
 
   function getEntries(date, slot) {
@@ -50,7 +47,6 @@ export default function Planner() {
       ...prev,
       [ds]: (prev[ds] || []).filter(e => !(e.slot === slot && e.recipe_id === recipeId))
     }))
-    setDirty(true)
   }
 
   function openPicker(date, slot) {
@@ -71,20 +67,8 @@ export default function Planner() {
         servings: pickerServings,
       }]
     }))
-    setDirty(true)
     setPickerTarget(null)
     setSelectedRecipe(null)
-  }
-
-  async function handleSave() {
-    setSaving(true)
-    try {
-      await updateMealPlan(() => plan)
-      setDirty(false)
-    } catch (e) {
-      alert('Save failed: ' + e.message)
-    }
-    setSaving(false)
   }
 
   const pickerFiltered = pickerSearch
@@ -107,16 +91,6 @@ export default function Planner() {
           Next →
         </button>
       </div>
-
-      {dirty && (
-        <div className="flex justify-end">
-          <button onClick={handleSave} disabled={saving}
-            className="bg-gray-900 text-white px-4 py-1.5 rounded text-sm
-                       hover:bg-gray-700 disabled:opacity-40 transition-colors">
-            {saving ? 'Saving…' : 'Save plan'}
-          </button>
-        </div>
-      )}
 
       {/* Calendar grid */}
       <div className="overflow-x-auto pb-2">

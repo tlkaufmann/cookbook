@@ -14,9 +14,7 @@ async function readFile(path) {
     { headers: { Authorization: `token ${token()}` }, cache: 'no-store' }
   )
   if (res.status === 404) {
-    // File doesn't exist yet - return empty default and null SHA (new file)
-    const empty = path.includes('meal_plan') ? {} : []
-    return { data: empty, sha: null }
+    return { data: [], sha: null }
   }
   if (!res.ok) throw new Error(`GitHub read failed: ${path} (${res.status})`)
   const { content, sha } = await res.json()
@@ -54,16 +52,9 @@ export async function fetchRecipes() {
   return res.json()
 }
 
-export async function fetchMealPlan() {
-  const res = await fetch(`${import.meta.env.BASE_URL}meal_plan.json?t=${Date.now()}`)
-  if (!res.ok) return {}
-  return res.json()
-}
-
 // --- Authenticated API access (for planner and recipe form writes) ---
 
 export const getRecipes = () => readFile('public/recipes.json')
-export const getMealPlan = () => readFile('public/meal_plan.json')
 
 // Per-file write queues — serialize concurrent writes to prevent SHA conflicts.
 // Each enqueued update reads a fresh SHA immediately before writing, so rapid
@@ -83,7 +74,6 @@ function enqueueUpdate(path, updateFn) {
 }
 
 export const updateRecipes = (fn) => enqueueUpdate('public/recipes.json', fn)
-export const updateMealPlan = (fn) => enqueueUpdate('public/meal_plan.json', fn)
 
 // --- Auth validation ---
 

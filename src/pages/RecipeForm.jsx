@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { fetchRecipes, updateRecipes, updateMealPlan } from '../lib/github'
+import { fetchRecipes, updateRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
 
 const UNITS = ['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', '']
@@ -107,21 +107,14 @@ export default function RecipeForm() {
 
   async function handleDelete() {
     if (!isEditing) return
-    const confirmed = window.confirm('Delete this recipe? This will also remove it from the meal plan.')
+    const confirmed = window.confirm('Delete this recipe?')
     if (!confirmed) return
 
     setDeleting(true)
     setError('')
 
     try {
-      await Promise.all([
-        updateRecipes(recipes => recipes.filter(r => r.id !== id)),
-        updateMealPlan(mealPlan => Object.fromEntries(
-          Object.entries(mealPlan)
-            .map(([date, entries]) => [date, entries.filter(e => e.recipe_id !== id)])
-            .filter(([, entries]) => entries.length > 0)
-        )),
-      ])
+      await updateRecipes(recipes => recipes.filter(r => r.id !== id))
 
       navigate('/', { replace: true })
     } catch (e) {

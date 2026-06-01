@@ -1,15 +1,21 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { fetchRecipes } from '../lib/github'
 import TagPill from '../components/TagPill'
 
 export default function RecipeList() {
-  const location = useLocation()
   const [recipes, setRecipes] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [activeTags, setActiveTags] = useState(new Set())
-  const notice = location.state?.actionNotice
+  const [notice, setNotice] = useState(() =>
+    sessionStorage.getItem('deployNotice') || ''
+  )
+
+  useEffect(() => {
+    // Remove after reading so it doesn't persist on refresh
+    sessionStorage.removeItem('deployNotice')
+  }, [])
 
   useEffect(() => {
     fetchRecipes().then(data => {
@@ -45,28 +51,46 @@ export default function RecipeList() {
     })
   }
 
-  if (loading) {
-    return <p className="text-gray-400 text-sm mt-12 text-center">Loading recipes…</p>
-  }
-
-  return (
-    <div className="space-y-6">
-      {notice && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+  const banner = notice && (
+    <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      <div className="flex items-start justify-between gap-3">
+        <div>
           <p className="font-medium">{notice}</p>
           <p className="mt-1 text-amber-800">
-            Follow deployment progress here:{' '}
+            Track progress:{' '}
             <a
               href="https://github.com/tlkaufmann/cookbook/actions/workflows/deploy.yml"
               target="_blank"
               rel="noreferrer"
               className="underline hover:no-underline"
             >
-              https://github.com/tlkaufmann/cookbook/actions/workflows/deploy.yml
+              GitHub Actions
             </a>
           </p>
         </div>
-      )}
+        <button
+          onClick={() => setNotice('')}
+          className="text-amber-600 hover:text-amber-900 text-lg leading-none shrink-0 mt-0.5"
+          aria-label="Dismiss"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  )
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        {banner}
+        <p className="text-gray-400 text-sm mt-12 text-center">Loading recipes…</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {banner}
 
       <input
         type="search"

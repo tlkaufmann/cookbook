@@ -11,7 +11,7 @@ export default function App() {
   return (
     <HashRouter>
       <Nav />
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={<RecipeList />} />
           <Route path="/recipe/:id" element={<RecipeDetail />} />

@@ -38,12 +38,20 @@ export default function RecipeDetail() {
           <h1 className="text-2xl font-bold text-gray-900 leading-tight">{recipe.title}</h1>
           <Link
             to={`/edit/${recipe.id}`}
-            className="shrink-0 text-sm text-gray-400 hover:text-gray-700
-                       border border-gray-200 rounded px-3 py-1 transition-colors"
+            className="shrink-0 text-sm text-[#143109] hover:opacity-80
+                       border border-[#143109]/20 rounded px-3 py-1 transition-colors"
           >
             Edit
           </Link>
         </div>
+
+        {recipe.image && (
+          <img
+            src={recipe.image}
+            alt={recipe.title}
+            className="w-full h-64 object-cover rounded-2xl"
+          />
+        )}
 
         {recipe.description && (
           <p className="text-gray-600">{recipe.description}</p>
@@ -58,7 +66,13 @@ export default function RecipeDetail() {
         <div className="flex flex-wrap gap-4 text-sm text-gray-500">
           {recipe.prep_min > 0 && <span>Prep: <strong>{recipe.prep_min} min</strong></span>}
           {recipe.cook_min > 0 && <span>Cook: <strong>{recipe.cook_min} min</strong></span>}
-          {recipe.source && <span>Source: <strong>{recipe.source}</strong></span>}
+          {recipe.source && (
+            <span>
+              <a href={recipe.source} target="_blank" rel="noreferrer" className="font-semibold text-[#143109] hover:underline">
+                Source
+              </a>
+            </span>
+          )}
         </div>
 
         {/* Servings scaler */}
@@ -67,8 +81,8 @@ export default function RecipeDetail() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setServings(s => Math.max(1, s - 1))}
-              className="w-7 h-7 rounded border border-gray-300 text-gray-600
-                         hover:bg-gray-50 flex items-center justify-center text-base leading-none"
+              className="w-7 h-7 rounded border border-[#143109]/20 text-[#143109]
+                         hover:bg-[#143109]/5 flex items-center justify-center text-base leading-none"
             >
               −
             </button>
@@ -77,8 +91,8 @@ export default function RecipeDetail() {
             </span>
             <button
               onClick={() => setServings(s => s + 1)}
-              className="w-7 h-7 rounded border border-gray-300 text-gray-600
-                         hover:bg-gray-50 flex items-center justify-center text-base leading-none"
+              className="w-7 h-7 rounded border border-[#143109]/20 text-[#143109]
+                         hover:bg-[#143109]/5 flex items-center justify-center text-base leading-none"
             >
               +
             </button>
@@ -86,7 +100,7 @@ export default function RecipeDetail() {
           {scale !== 1 && (
             <button
               onClick={() => setServings(recipe.servings)}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs text-[#143109] hover:opacity-80 transition-colors"
             >
               Reset
             </button>

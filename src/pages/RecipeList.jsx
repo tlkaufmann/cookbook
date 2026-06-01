@@ -54,8 +54,8 @@ export default function RecipeList() {
         placeholder="Search recipes or ingredients…"
         value={search}
         onChange={e => setSearch(e.target.value)}
-        className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-gray-300"
+        className="w-full border border-[#143109]/20 rounded-lg px-4 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-[#143109]/20"
       />
 
       {allTags.length > 0 && (
@@ -71,7 +71,7 @@ export default function RecipeList() {
           {activeTags.size > 0 && (
             <button
               onClick={() => setActiveTags(new Set())}
-              className="text-xs text-gray-400 hover:text-gray-600 ml-1 transition-colors"
+              className="text-xs text-[#143109] hover:opacity-80 ml-1 transition-colors"
             >
               Clear filters
             </button>
@@ -81,7 +81,7 @@ export default function RecipeList() {
 
       {filtered.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-500 text-sm">
             {recipes.length === 0 ? 'No recipes yet. Add your first one!' : 'No recipes match your filters.'}
           </p>
         </div>
@@ -91,9 +91,16 @@ export default function RecipeList() {
             <Link
               key={recipe.id}
               to={`/recipe/${recipe.id}`}
-              className="block border border-gray-200 rounded-lg p-4
-                         hover:border-gray-400 transition-colors"
+              className="block border border-[#143109]/15 rounded-lg p-4 bg-white/80
+                         hover:border-[#143109]/35 transition-colors overflow-hidden"
             >
+              {recipe.image && (
+                <img
+                  src={recipe.image}
+                  alt={recipe.title}
+                  className="w-full h-40 object-cover rounded-xl mb-3"
+                />
+              )}
               <h2 className="font-semibold text-gray-900 mb-1">{recipe.title}</h2>
               {recipe.description && (
                 <p className="text-sm text-gray-500 mb-3 line-clamp-2">
@@ -106,11 +113,11 @@ export default function RecipeList() {
                     <TagPill key={tag} tag={tag} />
                   ))}
                   {(recipe.tags?.length || 0) > 3 && (
-                    <span className="text-xs text-gray-400">+{recipe.tags.length - 3}</span>
+                    <span className="text-xs text-[#143109]">+{recipe.tags.length - 3}</span>
                   )}
                 </div>
                 {((recipe.prep_min || 0) + (recipe.cook_min || 0)) > 0 && (
-                  <span className="text-xs text-gray-400 shrink-0">
+                  <span className="text-xs text-[#143109] shrink-0">
                     {(recipe.prep_min || 0) + (recipe.cook_min || 0)} min
                   </span>
                 )}

@@ -33,14 +33,14 @@ export default function AuthGate({ children }) {
         value={pat}
         onChange={e => setPat(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && handleUnlock()}
-        className="border border-gray-300 rounded px-3 py-2 w-80 font-mono text-sm
-                   focus:outline-none focus:ring-2 focus:ring-gray-400"
+        className="border border-[#143109]/20 rounded px-3 py-2 w-80 font-mono text-sm
+             focus:outline-none focus:ring-2 focus:ring-[#143109]/30"
       />
       <button
         onClick={handleUnlock}
         disabled={loading || !pat}
-        className="bg-gray-900 text-white px-6 py-2 rounded text-sm font-medium
-                   hover:bg-gray-700 disabled:opacity-40 transition-colors"
+        className="bg-[#143109] text-white px-6 py-2 rounded text-sm font-medium
+             hover:opacity-90 disabled:opacity-40 transition-colors"
       >
         {loading ? 'Checking…' : 'Unlock'}
       </button>

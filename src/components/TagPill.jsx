@@ -1,8 +1,8 @@
 export default function TagPill({ tag, active, onClick, onRemove }) {
   if (onRemove) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100
-                       text-gray-700 rounded text-xs">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#143109]/10
+               text-[#143109] rounded text-xs">
         {tag}
         <button
           type="button"
@@ -22,8 +22,8 @@ export default function TagPill({ tag, active, onClick, onRemove }) {
         onClick={() => onClick(tag)}
         className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
           active
-            ? 'bg-gray-900 text-white'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            ? 'bg-[#143109] text-white'
+            : 'bg-[#143109]/10 text-[#143109] hover:bg-[#143109]/20'
         }`}
       >
         {tag}
@@ -32,7 +32,7 @@ export default function TagPill({ tag, active, onClick, onRemove }) {
   }
 
   return (
-    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+    <span className="px-2 py-0.5 bg-[#143109]/10 text-[#143109] rounded text-xs">
       {tag}
     </span>
   )

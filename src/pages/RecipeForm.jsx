@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { fetchRecipes, getRecipes, saveRecipes } from '../lib/github'
+import { fetchRecipes, getRecipes, getMealPlan, saveRecipes, saveMealPlan } from '../lib/github'
 import TagPill from '../components/TagPill'
 
 const UNITS = ['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'oz', 'lb', '']
@@ -11,7 +11,7 @@ function blankRecipe() {
     title: '', description: '', servings: 2,
     prep_min: 0, cook_min: 0, tags: [],
     ingredients: [blankIngredient()],
-    steps: [''], source: '',
+    steps: [''], source: '', image: '',
   }
 }
 
@@ -24,6 +24,7 @@ export default function RecipeForm() {
   const [tagInput, setTagInput] = useState('')
   const [allTags, setAllTags] = useState([])
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(isEditing)
 
@@ -107,6 +108,39 @@ export default function RecipeForm() {
     }
   }
 
+  async function handleDelete() {
+    if (!isEditing) return
+    const confirmed = window.confirm('Delete this recipe? This will also remove it from the meal plan.')
+    if (!confirmed) return
+
+    setDeleting(true)
+    setError('')
+
+    try {
+      const [{ data: recipes, sha: recipesSha }, { data: mealPlan, sha: mealPlanSha }] = await Promise.all([
+        getRecipes(),
+        getMealPlan(),
+      ])
+
+      const nextRecipes = recipes.filter(r => r.id !== id)
+      const nextMealPlan = Object.fromEntries(
+        Object.entries(mealPlan)
+          .map(([date, entries]) => [date, entries.filter(entry => entry.recipe_id !== id)])
+          .filter(([, entries]) => entries.length > 0)
+      )
+
+      await Promise.all([
+        saveRecipes(nextRecipes, recipesSha),
+        saveMealPlan(nextMealPlan, mealPlanSha),
+      ])
+
+      navigate('/', { replace: true })
+    } catch (e) {
+      setError(e.message)
+      setDeleting(false)
+    }
+  }
+
   if (loading) return <p className="text-gray-400 text-sm mt-12 text-center">Loading…</p>
 
   const inputCls = 'w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300'
@@ -114,18 +148,30 @@ export default function RecipeForm() {
   return (
     <div className="space-y-8 pb-16">
       {/* Top bar */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-bold text-gray-900">
           {isEditing ? 'Edit Recipe' : 'New Recipe'}
         </h1>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-gray-900 text-white px-4 py-2 rounded text-sm font-medium
-                     hover:bg-gray-700 disabled:opacity-40 transition-colors"
-        >
-          {saving ? 'Saving…' : 'Save Recipe'}
-        </button>
+        <div className="flex items-center gap-2">
+          {isEditing && (
+            <button
+              onClick={handleDelete}
+              disabled={saving || deleting}
+              className="bg-white text-red-600 border border-red-200 px-4 py-2 rounded text-sm font-medium
+                         hover:bg-red-50 disabled:opacity-40 transition-colors"
+            >
+              {deleting ? 'Deleting…' : 'Delete'}
+            </button>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={saving || deleting}
+            className="bg-[#143109] text-white px-4 py-2 rounded text-sm font-medium
+                       hover:opacity-90 disabled:opacity-40 transition-colors"
+          >
+            {saving ? 'Saving…' : 'Save Recipe'}
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -159,7 +205,22 @@ export default function RecipeForm() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
           <input value={form.source} onChange={e => field('source', e.target.value)}
-            className={inputCls} placeholder="Book, website, person…" />
+            className={inputCls} placeholder="https://example.com" />
+          {form.source && /^https?:\/\//.test(form.source) && (
+            <a
+              href={form.source}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-block text-xs text-[#143109] hover:underline break-all"
+            >
+              Open source link
+            </a>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+          <input value={form.image || ''} onChange={e => field('image', e.target.value)}
+            className={inputCls} placeholder="https://images.example.com/photo.jpg" />
         </div>
       </section>
 
@@ -249,11 +310,20 @@ export default function RecipeForm() {
       </section>
 
       {/* Bottom save */}
-      <button onClick={handleSave} disabled={saving}
-        className="w-full bg-gray-900 text-white py-3 rounded font-medium
-                   hover:bg-gray-700 disabled:opacity-40 transition-colors">
-        {saving ? 'Saving…' : 'Save Recipe'}
-      </button>
+      <div className="flex gap-2">
+        {isEditing && (
+          <button onClick={handleDelete} disabled={saving || deleting}
+            className="flex-1 bg-white text-red-600 border border-red-200 py-3 rounded font-medium
+                       hover:bg-red-50 disabled:opacity-40 transition-colors">
+            {deleting ? 'Deleting…' : 'Delete Recipe'}
+          </button>
+        )}
+        <button onClick={handleSave} disabled={saving || deleting}
+          className="flex-[2] bg-[#143109] text-white py-3 rounded font-medium
+                     hover:opacity-90 disabled:opacity-40 transition-colors">
+          {saving ? 'Saving…' : 'Save Recipe'}
+        </button>
+      </div>
     </div>
   )
 }

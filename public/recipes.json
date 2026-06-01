@@ -101,7 +101,9 @@
     "servings": 2,
     "prep_min": 30,
     "cook_min": 0,
-    "tags": [],
+    "tags": [
+      "asian"
+    ],
     "ingredients": [
       {
         "amount": 100,
@@ -202,6 +204,7 @@
     "cook_min": 0,
     "tags": [
       "asian",
+      "healthy",
       "salad"
     ],
     "ingredients": [
@@ -474,7 +477,9 @@
     "servings": 6,
     "prep_min": 20,
     "cook_min": 30,
-    "tags": [],
+    "tags": [
+      "pasta"
+    ],
     "ingredients": [
       {
         "amount": 9,
@@ -534,6 +539,7 @@
     "prep_min": 10,
     "cook_min": 5,
     "tags": [
+      "asian",
       "quick"
     ],
     "ingredients": [
@@ -627,8 +633,8 @@
     "prep_min": 20,
     "cook_min": 0,
     "tags": [
-      "salad",
-      "healthy"
+      "healthy",
+      "salad"
     ],
     "ingredients": [
       {

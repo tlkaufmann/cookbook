@@ -6,23 +6,87 @@
     "servings": 6,
     "prep_min": 20,
     "cook_min": 80,
-    "tags": ["italian", "vegetarian", "dinner"],
+    "tags": [
+      "italian",
+      "vegetarian",
+      "dinner"
+    ],
     "ingredients": [
-      { "amount": 2, "unit": "", "name": "aubergines" },
-      { "amount": 1, "unit": "tbsp", "name": "olive oil" },
-      { "amount": 100, "unit": "g", "name": "plain flour" },
-      { "amount": 3, "unit": "", "name": "eggs" },
-      { "amount": 250, "unit": "g", "name": "panko breadcrumbs" },
-      { "amount": 150, "unit": "g", "name": "Parmesan, finely grated" },
-      { "amount": 2, "unit": "tsp", "name": "mixed herbs" },
-      { "amount": 1, "unit": "tsp", "name": "garlic powder" },
-      { "amount": 1, "unit": "tsp", "name": "salt" },
-      { "amount": 1, "unit": "tsp", "name": "black pepper" },
-      { "amount": 3, "unit": "cloves", "name": "garlic" },
-      { "amount": 2, "unit": "tsp", "name": "white wine vinegar" },
-      { "amount": 2, "unit": "cans", "name": "chopped tomatoes" },
-      { "amount": 1, "unit": "handful", "name": "fresh basil" },
-      { "amount": 2, "unit": "to 3 balls", "name": "mozzarella, sliced" }
+      {
+        "amount": 2,
+        "unit": "",
+        "name": "aubergines"
+      },
+      {
+        "amount": 1,
+        "unit": "tbsp",
+        "name": "olive oil"
+      },
+      {
+        "amount": 100,
+        "unit": "g",
+        "name": "plain flour"
+      },
+      {
+        "amount": 3,
+        "unit": "",
+        "name": "eggs"
+      },
+      {
+        "amount": 250,
+        "unit": "g",
+        "name": "panko breadcrumbs"
+      },
+      {
+        "amount": 150,
+        "unit": "g",
+        "name": "Parmesan, finely grated"
+      },
+      {
+        "amount": 2,
+        "unit": "tsp",
+        "name": "mixed herbs"
+      },
+      {
+        "amount": 1,
+        "unit": "tsp",
+        "name": "garlic powder"
+      },
+      {
+        "amount": 1,
+        "unit": "tsp",
+        "name": "salt"
+      },
+      {
+        "amount": 1,
+        "unit": "tsp",
+        "name": "black pepper"
+      },
+      {
+        "amount": 3,
+        "unit": "cloves",
+        "name": "garlic"
+      },
+      {
+        "amount": 2,
+        "unit": "tsp",
+        "name": "white wine vinegar"
+      },
+      {
+        "amount": 2,
+        "unit": "cans",
+        "name": "chopped tomatoes"
+      },
+      {
+        "amount": 1,
+        "unit": "handful",
+        "name": "fresh basil"
+      },
+      {
+        "amount": 2,
+        "unit": "to 3 balls",
+        "name": "mozzarella, sliced"
+      }
     ],
     "steps": [
       "Slice and salt the aubergines, then let them drain and dry.",
@@ -41,24 +105,92 @@
     "servings": 2,
     "prep_min": 30,
     "cook_min": 0,
-    "tags": ["thai", "vegetarian", "noodles"],
+    "tags": [
+      "thai",
+      "vegetarian",
+      "noodles"
+    ],
     "ingredients": [
-      { "amount": 100, "unit": "g", "name": "rice noodles" },
-      { "amount": 1, "unit": "", "name": "shallot" },
-      { "amount": 2, "unit": "cloves", "name": "garlic" },
-      { "amount": 100, "unit": "g", "name": "bean sprouts" },
-      { "amount": 2, "unit": "", "name": "spring onions" },
-      { "amount": 1, "unit": "", "name": "carrot" },
-      { "amount": 100, "unit": "g", "name": "mushrooms" },
-      { "amount": 0.5, "unit": "bunch", "name": "coriander" },
-      { "amount": 1, "unit": "", "name": "lime" },
-      { "amount": 100, "unit": "g", "name": "firm tofu" },
-      { "amount": 1, "unit": "tbsp", "name": "tamarind paste" },
-      { "amount": 4, "unit": "tbsp", "name": "soy sauce" },
-      { "amount": 1, "unit": "tbsp", "name": "brown sugar" },
-      { "amount": 2, "unit": "tbsp", "name": "rapeseed oil" },
-      { "amount": 2, "unit": "", "name": "eggs" },
-      { "amount": 2, "unit": "tbsp", "name": "peanuts, chopped" }
+      {
+        "amount": 100,
+        "unit": "g",
+        "name": "rice noodles"
+      },
+      {
+        "amount": 1,
+        "unit": "",
+        "name": "shallot"
+      },
+      {
+        "amount": 2,
+        "unit": "cloves",
+        "name": "garlic"
+      },
+      {
+        "amount": 100,
+        "unit": "g",
+        "name": "bean sprouts"
+      },
+      {
+        "amount": 2,
+        "unit": "",
+        "name": "spring onions"
+      },
+      {
+        "amount": 1,
+        "unit": "",
+        "name": "carrot"
+      },
+      {
+        "amount": 100,
+        "unit": "g",
+        "name": "mushrooms"
+      },
+      {
+        "amount": 0.5,
+        "unit": "bunch",
+        "name": "coriander"
+      },
+      {
+        "amount": 1,
+        "unit": "",
+        "name": "lime"
+      },
+      {
+        "amount": 100,
+        "unit": "g",
+        "name": "firm tofu"
+      },
+      {
+        "amount": 1,
+        "unit": "tbsp",
+        "name": "tamarind paste"
+      },
+      {
+        "amount": 4,
+        "unit": "tbsp",
+        "name": "soy sauce"
+      },
+      {
+        "amount": 1,
+        "unit": "tbsp",
+        "name": "brown sugar"
+      },
+      {
+        "amount": 2,
+        "unit": "tbsp",
+        "name": "rapeseed oil"
+      },
+      {
+        "amount": 2,
+        "unit": "",
+        "name": "eggs"
+      },
+      {
+        "amount": 2,
+        "unit": "tbsp",
+        "name": "peanuts, chopped"
+      }
     ],
     "steps": [
       "Soak the noodles and prep the vegetables, tofu and sauce.",
@@ -69,5 +201,27 @@
     "image": "https://www.einfachkochen.de/sites/einfachkochen.de/files/styles/1946_1460/public/2021-07/pad-thai-vegetarisch-quer-5219.jpg?h=92704f59&itok=_DAnID6z",
     "source": "https://www.einfachkochen.de/rezepte/vegetarisches-pad-thai-unglaublich-lecker",
     "created_at": "2026-06-01T11:10:59.355Z"
+  },
+  {
+    "title": "test",
+    "description": "",
+    "servings": 2,
+    "prep_min": 0,
+    "cook_min": 0,
+    "tags": [],
+    "ingredients": [
+      {
+        "amount": "",
+        "unit": "g",
+        "name": ""
+      }
+    ],
+    "steps": [
+      ""
+    ],
+    "source": "",
+    "image": "",
+    "id": "1780313751386",
+    "created_at": "2026-06-01T11:35:51.386Z"
   }
 ]

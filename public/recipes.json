@@ -286,25 +286,100 @@
     "created_at": "2026-06-01T14:39:31.469Z"
   },
   {
-    "title": "test 2",
-    "description": "",
-    "servings": 2,
-    "prep_min": 0,
-    "cook_min": 0,
-    "tags": [],
+    "title": "Creamy Pasta Gorgonzola Recipe With Mushrooms",
+    "description": "If you love gorgonzola cheese or are a fan of blue cheese in general youâre going to love this pasta gorgonzola with a rich creamy gorgonzola sauce! Gorgonzola is my favorite cheese or at least one of my favorite cheeses (I have many). But you can make this easy vegetarian recipe with another blue cheese if you prefer.",
+    "servings": 4,
+    "prep_min": 15,
+    "cook_min": 15,
+    "tags": [
+      "vegetarian",
+      "gorgonzola",
+      "pasta",
+      "mushrooms",
+      "creamy",
+      "quick",
+      "easy",
+      "weeknight"
+    ],
     "ingredients": [
       {
-        "amount": "",
+        "amount": null,
+        "unit": "",
+        "name": "pasta"
+      },
+      {
+        "amount": 100,
         "unit": "g",
-        "name": ""
+        "name": "gorgonzola cheese"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "mushrooms (e.g., chestnut)"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "walnuts, chopped"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "heavy cream"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "milk"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "olive oil"
+      },
+      {
+        "amount": "a good bit",
+        "unit": "",
+        "name": "butter"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "salt"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "pasta cooking water"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "fresh parsley"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "black pepper"
+      },
+      {
+        "amount": null,
+        "unit": "",
+        "name": "white wine (optional)"
       }
     ],
     "steps": [
-      ""
+      "Make the gorgonzola sauce by combining heavy cream, milk, and 100g gorgonzola cheese.",
+      "Cook the pasta al dente in a large pot of salted water, reserving some pasta water before draining. Drain the pasta and toss with olive oil to prevent sticking.",
+      "In a large skillet, bake the mushrooms on medium heat in olive oil and butter until golden brown. Optionally, add a little white wine to the pan.",
+      "Add the gorgonzola sauce to the skillet with the mushrooms and mix well.",
+      "Add the cooked pasta to the pan and toss everything together.",
+      "Add a splash of the reserved pasta water to achieve a creamy gorgonzola pasta sauce.",
+      "Serve the pasta gorgonzola topped with chopped walnuts, fresh parsley, and black pepper."
     ],
-    "source": "",
-    "image": "",
-    "id": "1780328362737",
-    "created_at": "2026-06-01T15:39:22.737Z"
+    "source": "https://insimoneskitchen.com/pasta-gorgonzola-recipe/",
+    "image": "https://insimoneskitchen.com/wp-content/uploads/2024/02/Pasta-gorgonzola-14.jpg",
+    "id": "17803291910910.101767936514362",
+    "created_at": "2026-06-01T15:53:11.091Z"
   }
 ]

@@ -11,7 +11,7 @@ function token() {
 async function readFile(path) {
   const res = await fetch(
     `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
-    { headers: { Authorization: `token ${token()}` } }
+    { headers: { Authorization: `token ${token()}` }, cache: 'no-store' }
   )
   if (res.status === 404) {
     // File doesn't exist yet - return empty default and null SHA (new file)

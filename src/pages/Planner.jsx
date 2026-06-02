@@ -157,8 +157,6 @@ export default function Planner() {
   }
 
   function clearShoppingList() {
-    const confirmed = window.confirm('Clear the shopping list and calendar meals?')
-    if (!confirmed) return
     setPlan({})
     setShoppingItems([])
     setConsolidateError('')

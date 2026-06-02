@@ -266,8 +266,7 @@ export default function Planner() {
           </button>
           <button
             onClick={clearShoppingList}
-            disabled={shoppingItems.length === 0}
-            className="border border-red-300 text-red-700 rounded px-4 py-2 text-sm hover:bg-red-50 disabled:opacity-40 transition-colors"
+            className="border border-red-300 text-red-700 rounded px-4 py-2 text-sm hover:bg-red-50 transition-colors"
           >
             Clear
           </button>
